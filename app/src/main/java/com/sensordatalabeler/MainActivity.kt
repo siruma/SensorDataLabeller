@@ -12,7 +12,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import com.sensordatalabeler.databinding.ActivityMainBinding
 
-class MainActivity:ComponentActivity() {
+class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val mainViewModel: MainViewModel by viewModels {
@@ -21,32 +21,37 @@ class MainActivity:ComponentActivity() {
 
     private var activeSensorLabeler = false
         set(newActiveStatus) {
-            if (field != newActiveStatus)
+            if (field != newActiveStatus) {
                 field = newActiveStatus
-                if (newActiveStatus){
-                    binding.startStopWalkingWorkoutButton.text =
+                if (newActiveStatus) {
+                    binding.startStopWorkoutButton.text =
                         getString(R.string.stop_sensor_button_text)
                 } else {
-                    binding.startStopWalkingWorkoutButton.text =
+                    binding.startStopWorkoutButton.text =
                         getString(R.string.start_sensor_button_text)
                 }
-            updateOutput(heardBeat)
+                updateOutput(heartBeat)
+            }
         }
 
-    private var heardBeat = 0
+    private var heartBeat = 0
 
     private var foregroundOnlyServiceBound = false
 
     private var foregroundOnlySensorLabelerService: ForegroundOnlySensorLabelerService? = null
 
+    //Connection monitor
     private var foregroundOnlyServiceConnection = object : ServiceConnection {
 
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            TODO("Not yet implemented")
+        override fun onServiceConnected(name: ComponentName, service: IBinder?) {
+            val binder = service as ForegroundOnlySensorLabelerService.LocalBinder
+            foregroundOnlySensorLabelerService = binder.sensorLabelerService
+            foregroundOnlyServiceBound = true
         }
 
-        override fun onServiceDisconnected(name: ComponentName?) {
-            TODO("Not yet implemented")
+        override fun onServiceDisconnected(name: ComponentName) {
+            foregroundOnlySensorLabelerService = null
+            foregroundOnlyServiceBound = false
         }
     }
 
@@ -54,6 +59,16 @@ class MainActivity:ComponentActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        mainViewModel.heardBeatPointsFlow.observe(this) { heartRate ->
+            heartBeat = heartRate
+            updateOutput(heartBeat)
+        }
+
+        mainViewModel.activeSensorLabelerFlow.observe(this) { active ->
+            Log.d(TAG, "Sensor Status change: $activeSensorLabeler")
+            activeSensorLabeler = active
+        }
     }
 
     override fun onStart() {
@@ -71,18 +86,18 @@ class MainActivity:ComponentActivity() {
         super.onStop()
     }
 
-    fun onClickWalkingWorkout(view: View) {
-        Log.d(TAG, "onClickWalkingWorkout()")
+    fun onClickSensorLabeler(view: View) {
+        Log.d(TAG, "onClickSensorLabeler()")
         if (activeSensorLabeler) {
             foregroundOnlySensorLabelerService?.stopSensorLabeler()
         } else {
-            foregroundOnlySensorLabelerService?.startSensorlabeler()
+            foregroundOnlySensorLabelerService?.startSensorLabeler()
         }
     }
 
     private fun updateOutput(measurement:Int) {
         Log.d(TAG,"updateOutput()")
-        val output = "{measurement} Heard beat per minute"
+        val output = getString(R.string.heart_rate_text, measurement)
         binding.outputTextView.text = output
     }
 

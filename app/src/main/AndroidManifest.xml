@@ -3,9 +3,12 @@
     package="com.sensordatalabeler">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-feature android:name="android.hardware.type.watch" />
 
     <application
+        android:name=".MainApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,7 +22,7 @@
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
         <activity
-            android:name="com.sensordatalabeler.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop">
@@ -30,10 +33,13 @@
         </activity>
 
         <service
-            android:name="com.sensordatalabeler.ForegroundOnlySensorLabelerService"
+            android:name=".ForegroundOnlySensorLabelerService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+        <receiver
+            android:name=".sensor.LocationUpdateBroadcastReceiver"
+            android:exported="false"/>
     </application>
 
 </manifest>
