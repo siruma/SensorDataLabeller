@@ -1,3 +1,16 @@
 <resources>
-    <string name="app_name">Sensor Data Labeller</string>
+    <string name="app_name">Sensor Data Labeler</string>
+    <!-- Notification related strings. -->
+    <string name="labeler_notification_started_text">Sensor Labeler loading…</string>
+    <string name="notification_title">Walking Workout</string>
+    <string name="launch_activity">Launch activity</string>
+    <string name="stop_sensor_notification_text">Stop sensor</string>
+
+    <!-- Activity related strings. -->
+    <string name="default_greeting_message">Click to start your sensor measurement!</string>
+    <string name="start_sensor_button_text">Start Sensor</string>
+    <string name="stop_sensor_button_text">Stop Sensor</string>
+
+    <!-- Shared Service and Activity strings. -->
+    <string name="heart_rate_text">%1$d heart rate!</string>
 </resources>
