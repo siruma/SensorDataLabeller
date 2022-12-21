@@ -26,23 +26,23 @@ class SensorLabelerDataStore(private val context: Context) {
             it[ACTIVE_SENSOR_LABELER_KEY] = activeSensorLabeler
         }
     }
-    val timeStampSensorPointFlow:Flow<Int> = context.dataStore.data.map {
+    val timeStampSensorFlow:Flow<Int> = context.dataStore.data.map {
         it[TIME_STAMP_POINT_KEY] ?:0
     }
 
-    val heardBeatSensorPointsFlow: Flow<Int> = context.dataStore.data.map {
+    val heartRateSensorFlow: Flow<Int> = context.dataStore.data.map {
         it[HEARD_BEAT_POINTS_KEY] ?: 0
     }
 
-    suspend fun setTimeStampSensorPoint(timeStampPoint: Int) {
+    suspend fun setTimeStampSensor(timeStamp: Int) {
         context.dataStore.edit {
-            it[TIME_STAMP_POINT_KEY] = timeStampPoint
+            it[TIME_STAMP_POINT_KEY] = timeStamp
         }
     }
 
-    suspend fun setHeardBeatSensorPoints(heardBeatPoints: Int){
+    suspend fun setHeartRateSensor(measurement: Int){
         context.dataStore.edit {
-            it[HEARD_BEAT_POINTS_KEY] = heardBeatPoints
+            it[HEARD_BEAT_POINTS_KEY] = measurement
         }
     }
 

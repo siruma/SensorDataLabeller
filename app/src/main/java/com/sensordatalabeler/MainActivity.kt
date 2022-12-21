@@ -26,15 +26,23 @@ class MainActivity : ComponentActivity() {
                 if (newActiveStatus) {
                     binding.startStopWorkoutButton.text =
                         getString(R.string.stop_sensor_button_text)
+                    updateOutput(heartRate)
                 } else {
                     binding.startStopWorkoutButton.text =
                         getString(R.string.start_sensor_button_text)
                 }
-                updateOutput(heartBeat)
+
             }
         }
 
-    private var heartBeat = 0
+    //Measurement values
+    private var heartRate = 0
+    private var time = 0
+    private var gyro = 0
+    private var accelerationX = 0
+    private var accelerationY = 0
+    private var gpsValue = 0
+
 
     private var foregroundOnlyServiceBound = false
 
@@ -59,10 +67,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.nameMeasurement.visibility = View.GONE
 
-        mainViewModel.heardBeatPointsFlow.observe(this) { heartRate ->
-            heartBeat = heartRate
-            updateOutput(heartBeat)
+        mainViewModel.heartRateFlow.observe(this) {measurement ->
+            heartRate = measurement
+            updateHeartRate(heartRate)
+        }
+
+        mainViewModel.timeStampFlow.observe(this) {measurement ->
+            time = measurement
+            updateTimeStamp(time)
         }
 
         mainViewModel.activeSensorLabelerFlow.observe(this) { active ->
@@ -90,9 +104,40 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "onClickSensorLabeler()")
         if (activeSensorLabeler) {
             foregroundOnlySensorLabelerService?.stopSensorLabeler()
+            binding.saveSensorDataButton.visibility = View.VISIBLE
+            binding.nameMeasurement.visibility = View.GONE
+            binding.outputTextView.text = getString(R.string.default_greeting_message)
         } else {
             foregroundOnlySensorLabelerService?.startSensorLabeler()
+            binding.saveSensorDataButton.visibility = View.GONE
+            binding.nameMeasurement.visibility = View.VISIBLE
         }
+    }
+
+    fun onClickSensorSave(view: View) {
+        Log.d(TAG,"onClickSensorSave()")
+        if(activeSensorLabeler) {
+            Log.d(TAG,"Sensor measurement ongoing")
+        } else {
+            Log.d(TAG, "Sensor data saved")
+        }
+    }
+
+    fun onClickSensorName(view: View) {
+        Log.d(TAG, "onClickSensorName()")
+        if(activeSensorLabeler){
+
+        }
+    }
+
+    private fun updateHeartRate(measurement : Int) {
+        Log.d(TAG, "updateHeartRate()")
+        val output = getString(R.string.heart_rate_text,measurement)
+        //binding.outputTextView.text = output
+    }
+    private fun updateTimeStamp(timeStamp: Int) {
+        Log.d(TAG, "updateTimeStamp()")
+        val output = getString(R.string.time_stamp_text,timeStamp)
     }
 
     private fun updateOutput(measurement:Int) {

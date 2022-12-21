@@ -7,7 +7,8 @@ import com.sensordatalabeler.data.SensorLabelerRepository
 
 class MainViewModel(sensorLabelerRepository: SensorLabelerRepository) : ViewModel() {
     val activeSensorLabelerFlow = sensorLabelerRepository.activeSensorLabelerFlow.asLiveData()
-    val heardBeatPointsFlow = sensorLabelerRepository.heardBeatSensorPointsFlow.asLiveData()
+    val heartRateFlow = sensorLabelerRepository.heartRateSensorFlow.asLiveData()
+    val timeStampFlow = sensorLabelerRepository.timeStampSensorFlow.asLiveData()
 }
 
 class MainViewModelFactory(

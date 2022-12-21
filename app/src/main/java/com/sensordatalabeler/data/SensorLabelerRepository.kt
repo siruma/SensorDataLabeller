@@ -11,10 +11,15 @@ class SensorLabelerRepository private constructor(
     suspend fun setActiveSensorLabeler(activeLabeler: Boolean) =
         sensorLabelerDataStore.setActiveSensorLabeler(activeLabeler)
 
-    val heardBeatSensorPointsFlow: Flow<Int> = sensorLabelerDataStore.heardBeatSensorPointsFlow
+    val heartRateSensorFlow: Flow<Int> = sensorLabelerDataStore.heartRateSensorFlow
 
-    suspend fun setHeardBeatSensorPoints(points: Int) =
-        sensorLabelerDataStore.setHeardBeatSensorPoints(points)
+    suspend fun setHeartRateSensor(measurement: Int) =
+        sensorLabelerDataStore.setHeartRateSensor(measurement)
+
+    val timeStampSensorFlow: Flow<Int> = sensorLabelerDataStore.timeStampSensorFlow
+
+    suspend fun setTimeStampSensor(timeStamp: Int) =
+        sensorLabelerDataStore.setTimeStampSensor(timeStamp)
 
     companion object {
         @Volatile private var INSTANCE : SensorLabelerRepository ? = null
