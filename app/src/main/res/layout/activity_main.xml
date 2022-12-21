@@ -34,6 +34,29 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/outputTextView" />
+        <Button
+            android:id="@+id/save_sensor_data_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/save_sensor_data_button_text"
+            android:onClick="onClickSensorSave"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/start_stop_workout_button"
+            />
+        <Button
+            android:id="@+id/name_measurement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/name_measurement"
+            android:onClick="onClickSensorName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/start_stop_workout_button"
+            />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.wear.widget.BoxInsetLayout>

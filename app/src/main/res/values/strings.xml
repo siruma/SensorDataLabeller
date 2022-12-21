@@ -7,10 +7,13 @@
     <string name="stop_sensor_notification_text">Stop sensor</string>
 
     <!-- Activity related strings. -->
-    <string name="default_greeting_message">Click to start your sensor measurement!</string>
+    <string name="default_greeting_message">Click to start your sensor measurement or Save Data</string>
     <string name="start_sensor_button_text">Start Sensor</string>
     <string name="stop_sensor_button_text">Stop Sensor</string>
+    <string name="save_sensor_data_button_text">Save Data</string>
+    <string name="name_measurement">Name Data</string>
 
     <!-- Shared Service and Activity strings. -->
     <string name="heart_rate_text">%1$d heart rate!</string>
+    <string name="time_stamp_text">Time: %1$d</string>
 </resources>
