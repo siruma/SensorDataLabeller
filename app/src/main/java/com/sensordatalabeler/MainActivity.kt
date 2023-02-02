@@ -10,10 +10,14 @@ import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
+import androidx.wear.widget.WearableLinearLayoutManager
+import androidx.wear.widget.WearableRecyclerView
 import com.sensordatalabeler.databinding.ActivityMainBinding
 
 class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var recycleView: WearableRecyclerView
 
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModelFactory((application as MainApp).repository)
@@ -67,14 +71,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.nameMeasurement.visibility = View.GONE
 
-        mainViewModel.heartRateFlow.observe(this) {measurement ->
+        mainViewModel.heartRateFlow.observe(this) { measurement ->
             heartRate = measurement
             updateHeartRate(heartRate)
         }
 
-        mainViewModel.timeStampFlow.observe(this) {measurement ->
+        mainViewModel.timeStampFlow.observe(this) { measurement ->
             time = measurement
             updateTimeStamp(time)
         }
@@ -89,7 +92,7 @@ class MainActivity : ComponentActivity() {
         super.onStart()
 
         val serviceIntent = Intent(this, ForegroundOnlySensorLabelerService::class.java)
-        bindService(serviceIntent, foregroundOnlyServiceConnection, Context.BIND_AUTO_CREATE)
+        bindService(serviceIntent, foregroundOnlyServiceConnection, BIND_AUTO_CREATE)
     }
 
     override fun onStop() {
@@ -115,9 +118,9 @@ class MainActivity : ComponentActivity() {
     }
 
     fun onClickSensorSave(view: View) {
-        Log.d(TAG,"onClickSensorSave()")
-        if(activeSensorLabeler) {
-            Log.d(TAG,"Sensor measurement ongoing")
+        Log.d(TAG, "onClickSensorSave()")
+        if (activeSensorLabeler) {
+            Log.d(TAG, "Sensor measurement ongoing")
         } else {
             Log.d(TAG, "Sensor data saved")
         }
@@ -125,23 +128,65 @@ class MainActivity : ComponentActivity() {
 
     fun onClickSensorName(view: View) {
         Log.d(TAG, "onClickSensorName()")
-        if(activeSensorLabeler){
-
+        if (activeSensorLabeler) {
+            nameSensorData()
         }
     }
 
-    private fun updateHeartRate(measurement : Int) {
-        Log.d(TAG, "updateHeartRate()")
-        val output = getString(R.string.heart_rate_text,measurement)
-        //binding.outputTextView.text = output
-    }
-    private fun updateTimeStamp(timeStamp: Int) {
-        Log.d(TAG, "updateTimeStamp()")
-        val output = getString(R.string.time_stamp_text,timeStamp)
+    fun onClickChoice(view: View) {
+        Log.d(TAG, "onClickChoice()")
+        saveChoice()
     }
 
-    private fun updateOutput(measurement:Int) {
-        Log.d(TAG,"updateOutput()")
+    fun onClickNext(view: View) {
+        Log.d(TAG, "onClickNext()")
+        if(binding.nameMenu1.isVisible) {
+           binding.nameMenu1.visibility = View.GONE
+            binding.nameMenu2.visibility = View.VISIBLE
+        }else if (binding.nameMenu2.isVisible){
+            binding.nameMenu2.visibility = View.GONE
+            binding.nameMenu3.visibility = View.VISIBLE
+        }else if (binding.nameMenu3.isVisible){
+            binding.nameMenu3.visibility = View.GONE
+            binding.nameMenu4.visibility = View.VISIBLE
+        }
+    }
+
+    fun onClickElse(view: View){
+        Log.d(TAG, "onClickElse()")
+        binding.nameMenu4.visibility = View.GONE
+    }
+
+
+    private fun saveChoice() {
+        binding.mainMenu.visibility = View.VISIBLE
+        if (binding.nameMenu1.isVisible) {
+            binding.nameMenu1.visibility = View.GONE
+        }else if (binding.nameMenu2.isVisible){
+            binding.nameMenu2.visibility = View.GONE
+        }else if (binding.nameMenu3.isVisible){
+            binding.nameMenu3.visibility = View.GONE
+        }
+    }
+
+    private fun nameSensorData() {
+        binding.mainMenu.visibility = View.GONE
+        binding.nameMenu1.visibility = View.VISIBLE
+    }
+
+    private fun updateHeartRate(measurement: Int) {
+        Log.d(TAG, "updateHeartRate()")
+        val output = getString(R.string.heart_rate_text, measurement)
+        //binding.outputTextView.text = output
+    }
+
+    private fun updateTimeStamp(timeStamp: Int) {
+        Log.d(TAG, "updateTimeStamp()")
+        val output = getString(R.string.time_stamp_text, timeStamp)
+    }
+
+    private fun updateOutput(measurement: Int) {
+        Log.d(TAG, "updateOutput()")
         val output = getString(R.string.heart_rate_text, measurement)
         binding.outputTextView.text = output
     }
