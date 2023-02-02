@@ -2,12 +2,13 @@
     <string name="app_name">Sensor Data Labeler</string>
     <!-- Notification related strings. -->
     <string name="labeler_notification_started_text">Sensor Labeler loading…</string>
-    <string name="notification_title">Walking Workout</string>
+    <string name="notification_title">Sensor labeler</string>
     <string name="launch_activity">Launch activity</string>
     <string name="stop_sensor_notification_text">Stop sensor</string>
 
     <!-- Activity related strings. -->
     <string name="default_greeting_message">Click to start your sensor measurement or Save Data</string>
+    <string name="save_sensor_data_greeting">Name and save your data</string>
     <string name="start_sensor_button_text">Start Sensor</string>
     <string name="stop_sensor_button_text">Stop Sensor</string>
     <string name="save_sensor_data_button_text">Save Data</string>
@@ -16,4 +17,17 @@
     <!-- Shared Service and Activity strings. -->
     <string name="heart_rate_text">%1$d heart rate!</string>
     <string name="time_stamp_text">Time: %1$d</string>
+
+    <!-- Choice Strings -->
+    <string name="choice_1">Walking</string>
+    <string name="choice_2">Running</string>
+    <string name="choice_3">Sitting</string>
+    <string name="choice_4">Laying down</string>
+    <string name="choice_5">Going up the stairs</string>
+    <string name="choice_6">Else</string>
+    <string name="next_string">more</string>
+
+    <!-- Keyboard -->
+    <string name="fast_input_label">Fast input IME</string>
+    <string name="subtype_en_US">English (US)</string>
 </resources>

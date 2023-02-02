@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sensordatalabeler">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:required="true" android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:required="true" android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:required="true" android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-feature android:name="android.hardware.type.watch" />
 
     <application
@@ -40,6 +40,17 @@
         <receiver
             android:name=".sensor.LocationUpdateBroadcastReceiver"
             android:exported="false"/>
+
+        <!-- Declares the input method service -->
+        <service android:name=".FastInputIME"
+            android:label="@string/fast_input_label"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data android:name="android.view.im"
+                android:resource="@xml/method" />
+        </service>
     </application>
 
 </manifest>
