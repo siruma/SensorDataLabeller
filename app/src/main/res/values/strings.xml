@@ -30,4 +30,6 @@
     <!-- Keyboard -->
     <string name="fast_input_label">Fast input IME</string>
     <string name="subtype_en_US">English (US)</string>
+    <string name="give_custom_name">Enter name of the activity</string>
+    <string name="save_string">Save</string>
 </resources>

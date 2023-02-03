@@ -1,7 +1,6 @@
 package com.sensordatalabeler
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
@@ -11,7 +10,6 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.wear.widget.WearableLinearLayoutManager
 import androidx.wear.widget.WearableRecyclerView
 import com.sensordatalabeler.databinding.ActivityMainBinding
 
@@ -148,17 +146,30 @@ class MainActivity : ComponentActivity() {
             binding.nameMenu3.visibility = View.VISIBLE
         }else if (binding.nameMenu3.isVisible){
             binding.nameMenu3.visibility = View.GONE
-            binding.nameMenu4.visibility = View.VISIBLE
+            binding.nameMenu1.visibility = View.VISIBLE
+            //binding.nameMenu4.visibility = View.VISIBLE
+        }else if(binding.nameMenu4.isVisible){
+            binding.nameMenu4.visibility = View.GONE
+            binding.nameMenu1.visibility = View.VISIBLE
         }
     }
 
     fun onClickElse(view: View){
         Log.d(TAG, "onClickElse()")
         binding.nameMenu4.visibility = View.GONE
+        binding.customName.visibility = View.VISIBLE
+
     }
 
 
+    fun onClickSave(view: View) {
+        //TODO save custom name and fix the problem with onscreen keyboard
+        binding.customName.visibility = View.GONE
+        binding.mainMenu.visibility = View.VISIBLE
+    }
+
     private fun saveChoice() {
+        // TODO Save the name of the measurement
         binding.mainMenu.visibility = View.VISIBLE
         if (binding.nameMenu1.isVisible) {
             binding.nameMenu1.visibility = View.GONE
