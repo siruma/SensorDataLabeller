@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    compileSdk 30
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.sensordatalabeler"
@@ -33,14 +33,15 @@ dependencies {
 
     // Wear specific libraries
     implementation 'androidx.wear:wear:1.1.0'
-
     implementation 'androidx.wear:wear-ongoing:1.0.0'
+
     // Includes LocusIdCompat and new Notification categories for Ongoing Activity.
     implementation 'androidx.core:core-ktx:1.6.0'
     implementation 'com.google.android.gms:play-services-wearable:18.0.0'
+
     //noinspection GradleCompatible
-    implementation 'com.android.support:percent:26.1.0'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
+    implementation 'androidx.percentlayout:percentlayout:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
@@ -49,12 +50,16 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-common-java8:2.3.1"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.lifecycle:lifecycle-service:2.3.1"
+
     // DataStore used to save simple data.
     implementation "androidx.datastore:datastore-preferences:1.0.0"
+
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1"
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
+
     //location
     implementation 'com.google.android.gms:play-services-location:21.0.1'
 }
