@@ -9,6 +9,8 @@ class MainViewModel(sensorLabelerRepository: SensorLabelerRepository) : ViewMode
     val activeSensorLabelerFlow = sensorLabelerRepository.activeSensorLabelerFlow.asLiveData()
     val heartRateFlow = sensorLabelerRepository.heartRateSensorFlow.asLiveData()
     val timeStampFlow = sensorLabelerRepository.timeStampSensorFlow.asLiveData()
+    val gyroRateFlow = sensorLabelerRepository.gyroRateSensorFlow.asLiveData()
+    val accelerationFlow = sensorLabelerRepository.accelerationRateSensorFlow.asLiveData()
 }
 
 class MainViewModelFactory(

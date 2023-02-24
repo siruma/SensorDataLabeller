@@ -21,6 +21,14 @@ class SensorLabelerRepository private constructor(
     suspend fun setTimeStampSensor(timeStamp: Int) =
         sensorLabelerDataStore.setTimeStampSensor(timeStamp)
 
+    val gyroRateSensorFlow: Flow<Int> = sensorLabelerDataStore.gyroRateSensorFlow
+     suspend fun setGyroRateSensor(gyroRate: Int) =
+         sensorLabelerDataStore.setGyroRateSensor(gyroRate)
+
+    val accelerationRateSensorFlow : Flow<Int> = sensorLabelerDataStore.accelerationRateSensorFlow
+    suspend fun setAccelerationRateSensor(measurementRate: Int) =
+        sensorLabelerDataStore.setAccelerationRateSensor(measurementRate)
+
     companion object {
         @Volatile private var INSTANCE : SensorLabelerRepository ? = null
 

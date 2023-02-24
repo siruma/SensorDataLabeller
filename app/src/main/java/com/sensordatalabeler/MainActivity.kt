@@ -10,12 +10,10 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.wear.widget.WearableRecyclerView
 import com.sensordatalabeler.databinding.ActivityMainBinding
 
 class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var recycleView: WearableRecyclerView
 
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModelFactory((application as MainApp).repository)
@@ -45,7 +43,6 @@ class MainActivity : ComponentActivity() {
     private var accelerationY = 0
     private var gpsValue = 0
 
-
     private var foregroundOnlyServiceBound = false
 
     private var foregroundOnlySensorLabelerService: ForegroundOnlySensorLabelerService? = null
@@ -73,6 +70,16 @@ class MainActivity : ComponentActivity() {
         mainViewModel.heartRateFlow.observe(this) { measurement ->
             heartRate = measurement
             updateHeartRate(heartRate)
+        }
+
+        mainViewModel.gyroRateFlow.observe(this) {measurement ->
+            gyro = measurement
+            updateGyro(gyro)
+        }
+
+        mainViewModel.accelerationFlow.observe(this) {measurement ->
+            accelerationX = measurement
+            updateAcceleration(accelerationX)
         }
 
         mainViewModel.timeStampFlow.observe(this) { measurement ->
@@ -187,8 +194,9 @@ class MainActivity : ComponentActivity() {
 
     private fun updateHeartRate(measurement: Int) {
         Log.d(TAG, "updateHeartRate()")
+        Log.d(TAG, "Heart Rate: $measurement")
         val output = getString(R.string.heart_rate_text, measurement)
-        //binding.outputTextView.text = output
+        binding.outputTextView.text = output
     }
 
     private fun updateTimeStamp(timeStamp: Int) {
@@ -199,6 +207,19 @@ class MainActivity : ComponentActivity() {
     private fun updateOutput(measurement: Int) {
         Log.d(TAG, "updateOutput()")
         val output = getString(R.string.heart_rate_text, measurement)
+        binding.outputTextView.text = output
+    }
+    private fun updateAcceleration(measurement: Int) {
+        Log.d(TAG, "updateAcceleration()")
+        Log.d(TAG, "Acceleration: $measurement")
+        val output = getString(R.string.acceleration_rate_text, measurement)
+        binding.outputTextView.text = output
+    }
+
+    private fun updateGyro(measurement: Int) {
+        Log.d(TAG, "updateGyro()")
+        Log.d(TAG, "Gyro rate: $measurement")
+        val output = getString(R.string.gyro_rate_text, measurement)
         binding.outputTextView.text = output
     }
 

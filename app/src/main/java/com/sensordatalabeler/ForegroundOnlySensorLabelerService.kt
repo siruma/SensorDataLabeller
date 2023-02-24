@@ -2,11 +2,14 @@ package com.sensordatalabeler
 
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.ActivityCompat
@@ -19,7 +22,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.wear.ongoing.OngoingActivity
 import androidx.wear.ongoing.Status
 import com.sensordatalabeler.data.SensorLabelerRepository
+import com.sensordatalabeler.sensor.SensorActivityService
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ForegroundOnlySensorLabelerService : LifecycleService() {
@@ -29,6 +34,10 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
     }
 
     private lateinit var notificationManager: NotificationManager
+
+    private lateinit var heartRateSensor: SensorActivityService
+    private lateinit var gyroRateSensor: SensorActivityService
+    private lateinit var accelerationRateSensor: SensorActivityService
 
     private var confChange = false
 
@@ -54,6 +63,23 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
             }
         }
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        heartRateSensor = SensorActivityService().onCreate(
+            getSystemService(SENSOR_SERVICE) as SensorManager,
+            Sensor.TYPE_HEART_RATE,
+            "HEART RATE"
+        )
+        gyroRateSensor = SensorActivityService().onCreate(
+            getSystemService(SENSOR_SERVICE) as SensorManager,
+            Sensor.TYPE_GYROSCOPE,
+            "GYROSCOPE"
+        )
+        accelerationRateSensor = SensorActivityService().onCreate(
+            getSystemService(SENSOR_SERVICE) as SensorManager,
+            Sensor.TYPE_ACCELEROMETER,
+            "ACCELEROMETER"
+        )
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -113,11 +139,23 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         Log.d(TAG, "startSensorLabeler()")
 
         setActiveSensorLabeler(true)
-
+        heartRateSensor.startMeasurement()
+        gyroRateSensor.startMeasurement()
+        accelerationRateSensor.startMeasurement()
         startService(Intent(applicationContext, ForegroundOnlySensorLabelerService::class.java))
         //TODO subscribe to location and sensor callbacks here
         dataFromSensorJob = lifecycleScope.launch {
             startLocationClient()
+            readSensorData()
+        }
+    }
+
+    private suspend fun readSensorData() {
+        while (true) {
+            heartRateSensor.let { sensorLabelerRepository.setHeartRateSensor(it.getMeasurementRate()) }
+            gyroRateSensor.let { sensorLabelerRepository.setGyroRateSensor(it.getMeasurementRate()) }
+            accelerationRateSensor.let { sensorLabelerRepository.setAccelerationRateSensor(it.getMeasurementRate()) }
+            delay(THREE_SECONDS_MILLISECONDS)
         }
     }
 
@@ -128,6 +166,9 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
 
     private fun stopSensorLabelerWithServiceShutdownOption(stopService: Boolean) {
         Log.d(TAG, "stopSensorLabelerWithServiceShutdownOption()")
+        heartRateSensor.stopMeasure()
+        gyroRateSensor.stopMeasure()
+        accelerationRateSensor.stopMeasure()
         dataFromSensorJob?.cancel()
 
         lifecycleScope.launch {
@@ -167,6 +208,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         }
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     private fun generateNotification(mainText: String): Notification {
         Log.d(TAG, "generateNotification()")
         //Create notification channel
@@ -226,6 +268,8 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
 
     companion object {
         private const val TAG = "ForegroundOnlyService"
+
+        private const val THREE_SECONDS_MILLISECONDS = 3000L
 
         private const val PACKAGE_NAME = "com.sensordatalabeler"
 

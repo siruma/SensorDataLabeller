@@ -17,6 +17,8 @@
     <!-- Shared Service and Activity strings. -->
     <string name="heart_rate_text">%1$d heart rate!</string>
     <string name="time_stamp_text">Time: %1$d</string>
+    <string name="acceleration_rate_text">Speed is %1$d</string>
+    <string name="gyro_rate_text">Gyro is %1$d</string>
 
     <!-- Choice Strings -->
     <string name="choice_1">Walking</string>
@@ -32,4 +34,5 @@
     <string name="subtype_en_US">English (US)</string>
     <string name="give_custom_name">Enter name of the activity</string>
     <string name="save_string">Save</string>
+
 </resources>
