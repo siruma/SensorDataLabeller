@@ -38,6 +38,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
     private lateinit var heartRateSensor: SensorActivityService
     private lateinit var gyroRateSensor: SensorActivityService
     private lateinit var accelerationRateSensor: SensorActivityService
+    private lateinit var stepCounterSensor: SensorActivityService
 
     private var confChange = false
 
@@ -78,6 +79,12 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
             getSystemService(SENSOR_SERVICE) as SensorManager,
             Sensor.TYPE_ACCELEROMETER,
             "ACCELEROMETER"
+        )
+
+        stepCounterSensor = SensorActivityService().onCreate(
+            getSystemService(SENSOR_SERVICE) as SensorManager,
+            Sensor.TYPE_STEP_COUNTER,
+            "STEP_COUNTER"
         )
 
     }
@@ -139,9 +146,10 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         Log.d(TAG, "startSensorLabeler()")
 
         setActiveSensorLabeler(true)
-        heartRateSensor.startMeasurement()
-        gyroRateSensor.startMeasurement()
-        accelerationRateSensor.startMeasurement()
+        heartRateSensor.startMeasurement(1000000)
+        gyroRateSensor.startMeasurement(0)
+        accelerationRateSensor.startMeasurement(0)
+        stepCounterSensor.startMeasurement(0)
         startService(Intent(applicationContext, ForegroundOnlySensorLabelerService::class.java))
         //TODO subscribe to location and sensor callbacks here
         dataFromSensorJob = lifecycleScope.launch {
@@ -163,6 +171,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
                 sensorLabelerRepository.setAccelerationXRateSensor(intArray[0])
                 sensorLabelerRepository.setAccelerationYRateSensor(intArray[1])
                 sensorLabelerRepository.setAccelerationZRateSensor(intArray[2])}
+            stepCounterSensor.let { sensorLabelerRepository.setStepCounterSensor(it.getMeasurementRate()[0]) }
             delay(THREE_SECONDS_MILLISECONDS)
         }
     }

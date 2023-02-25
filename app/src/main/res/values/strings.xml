@@ -19,6 +19,7 @@
     <string name="time_stamp_text">Time: %1$d</string>
     <string name="acceleration_rate_text">Speed is (%1$d, %2$d, %3$d)</string>
     <string name="gyro_rate_text">Gyro is (%1$d, %2$d, %3$d)</string>
+    <string name="step_counter_text">Steps: %1$d</string>
 
     <!-- Choice Strings -->
     <string name="choice_1">Walking</string>

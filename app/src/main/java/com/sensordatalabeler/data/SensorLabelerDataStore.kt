@@ -31,6 +31,11 @@ class SensorLabelerDataStore(private val context: Context) {
         it[HEART_BEAT_POINTS_KEY] ?: 0
     }
 
+    // STEP COUNTER
+    val stepCounterSensorFlow: Flow<Int> = context.dataStore.data.map {
+        it[STEP_COUNTER_POINTS_KEY] ?: 0
+    }
+
     // GYRO RATE
     val gyroXRateSensorFlow: Flow<Int> = context.dataStore.data.map {
         it[GYRO_X_RATE_POINTS_KEY] ?: 0
@@ -76,6 +81,13 @@ class SensorLabelerDataStore(private val context: Context) {
         }
     }
 
+    // STEP COUNTER
+    suspend fun setStepCounterSensor(measurement: Int){
+        context.dataStore.edit {
+            it[STEP_COUNTER_POINTS_KEY] = measurement
+        }
+    }
+
     // GYRO RATE
     suspend fun setGyroXRateSensor(measurement: Int){
         context.dataStore.edit {
@@ -112,10 +124,15 @@ class SensorLabelerDataStore(private val context: Context) {
 
     companion object {
         private const val SENSOR_LABELER_DATASTORE_NAME = "sensor_labeler_datastore"
-
-        private val TIME_STAMP_POINT_KEY = intPreferencesKey("time_stamp_point")
-        private val HEART_BEAT_POINTS_KEY = intPreferencesKey("heart_beat_points")
         private val ACTIVE_SENSOR_LABELER_KEY = booleanPreferencesKey("active_sensor_labeler")
+
+        // TIME STAMP
+        private val TIME_STAMP_POINT_KEY = intPreferencesKey("time_stamp_point")
+        // HEART BEAT
+        private val HEART_BEAT_POINTS_KEY = intPreferencesKey("heart_beat_points")
+        // STEP COUNTER
+        private val STEP_COUNTER_POINTS_KEY = intPreferencesKey("step_counter_points")
+
 
         // GYRO RATE
         private val GYRO_X_RATE_POINTS_KEY = intPreferencesKey("gyro_x_rate_points")

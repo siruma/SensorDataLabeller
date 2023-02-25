@@ -35,8 +35,8 @@ class SensorActivityService: SensorEventListener {
         return this
     }
 
-    fun startMeasurement() {
-        val sensorRegistered = mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST)
+    fun startMeasurement( delay : Int) {
+        val sensorRegistered = mSensorManager.registerListener(this, mSensor, delay)
         Log.d(TAG, "$mName Sensor registered: " + (if (sensorRegistered) "yes" else "no"))
     }
 
@@ -45,7 +45,7 @@ class SensorActivityService: SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        if(mName == "HEART RATE"){
+        if(mName == "HEART RATE" || mName == "STEP_COUNTER"){
             val mMeasurementFloat = event.values[0]
             mMeasurement[0] = mMeasurementFloat.roundToInt()
         }else {
