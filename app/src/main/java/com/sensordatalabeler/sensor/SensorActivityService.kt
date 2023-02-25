@@ -5,6 +5,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
+import java.io.Serializable
 import kotlin.math.roundToInt
 
 
@@ -16,7 +17,7 @@ class SensorActivityService: SensorEventListener {
     private lateinit var mSensorManager : SensorManager
     private var mSensor : Sensor ?= null
 
-    private var mMeasurement = 0
+    private val mMeasurement: IntArray = IntArray(3)
 
 
 
@@ -44,10 +45,18 @@ class SensorActivityService: SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        //val mHeartRateFloat = event.values[0]
-        //mHeartRate = mHeartRateFloat.roundToInt()
-        val mMeasurementFloat = event.values[0]
-        mMeasurement = mMeasurementFloat.roundToInt()
+        if(mName == "HEART RATE"){
+            val mMeasurementFloat = event.values[0]
+            mMeasurement[0] = mMeasurementFloat.roundToInt()
+        }else {
+            val mMeasurementFloatX = event.values[0]
+            val mMeasurementFloatY = event.values[1]
+            val mMeasurementFloatZ = event.values[2]
+            mMeasurement[0] = mMeasurementFloatX.roundToInt()
+            mMeasurement[1] = mMeasurementFloatY.roundToInt()
+            mMeasurement[2] = mMeasurementFloatZ.roundToInt()
+        }
+
     }
 
 
@@ -59,8 +68,8 @@ class SensorActivityService: SensorEventListener {
         mSensorManager.unregisterListener(this)
     }
 
-    fun getMeasurementRate(): Int {
-        return mMeasurement
+    fun getMeasurementRate(): IntArray {
+            return mMeasurement
     }
 
 

@@ -152,9 +152,17 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
 
     private suspend fun readSensorData() {
         while (true) {
-            heartRateSensor.let { sensorLabelerRepository.setHeartRateSensor(it.getMeasurementRate()) }
-            gyroRateSensor.let { sensorLabelerRepository.setGyroRateSensor(it.getMeasurementRate()) }
-            accelerationRateSensor.let { sensorLabelerRepository.setAccelerationRateSensor(it.getMeasurementRate()) }
+            heartRateSensor.let { sensorLabelerRepository.setHeartRateSensor(it.getMeasurementRate()[0]) }
+            gyroRateSensor.let {
+                val intArray = it.getMeasurementRate()
+                sensorLabelerRepository.setGyroXRateSensor(intArray[0])
+                sensorLabelerRepository.setGyroYRateSensor(intArray[1])
+                sensorLabelerRepository.setGyroZRateSensor(intArray[2])}
+            accelerationRateSensor.let {
+                val intArray = it.getMeasurementRate()
+                sensorLabelerRepository.setAccelerationXRateSensor(intArray[0])
+                sensorLabelerRepository.setAccelerationYRateSensor(intArray[1])
+                sensorLabelerRepository.setAccelerationZRateSensor(intArray[2])}
             delay(THREE_SECONDS_MILLISECONDS)
         }
     }

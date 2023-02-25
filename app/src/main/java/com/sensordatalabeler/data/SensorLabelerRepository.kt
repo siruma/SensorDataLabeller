@@ -21,13 +21,29 @@ class SensorLabelerRepository private constructor(
     suspend fun setTimeStampSensor(timeStamp: Int) =
         sensorLabelerDataStore.setTimeStampSensor(timeStamp)
 
-    val gyroRateSensorFlow: Flow<Int> = sensorLabelerDataStore.gyroRateSensorFlow
-     suspend fun setGyroRateSensor(gyroRate: Int) =
-         sensorLabelerDataStore.setGyroRateSensor(gyroRate)
+    // GYRO RATE
+    val gyroXRateSensorFlow: Flow<Int> = sensorLabelerDataStore.gyroXRateSensorFlow
+    val gyroYRateSensorFlow: Flow<Int> = sensorLabelerDataStore.gyroYRateSensorFlow
+    val gyroZRateSensorFlow: Flow<Int> = sensorLabelerDataStore.gyroZRateSensorFlow
 
-    val accelerationRateSensorFlow : Flow<Int> = sensorLabelerDataStore.accelerationRateSensorFlow
-    suspend fun setAccelerationRateSensor(measurementRate: Int) =
-        sensorLabelerDataStore.setAccelerationRateSensor(measurementRate)
+     suspend fun setGyroXRateSensor(gyroRate: Int) =
+             sensorLabelerDataStore.setGyroXRateSensor(gyroRate)
+    suspend fun setGyroYRateSensor(gyroRate: Int) =
+        sensorLabelerDataStore.setGyroYRateSensor(gyroRate)
+    suspend fun setGyroZRateSensor(gyroRate: Int) =
+            sensorLabelerDataStore.setGyroZRateSensor(gyroRate)
+
+
+    // ACCELERATION RATE
+    val accelerationXRateSensorFlow : Flow<Int> = sensorLabelerDataStore.accelerationXRateSensorFlow
+    val accelerationYRateSensorFlow : Flow<Int> = sensorLabelerDataStore.accelerationYRateSensorFlow
+    val accelerationZRateSensorFlow : Flow<Int> = sensorLabelerDataStore.accelerationZRateSensorFlow
+    suspend fun setAccelerationXRateSensor(measurementRate: Int) =
+        sensorLabelerDataStore.setAccelerationXRateSensor(measurementRate)
+    suspend fun setAccelerationYRateSensor(measurementRate: Int) =
+        sensorLabelerDataStore.setAccelerationYRateSensor(measurementRate)
+    suspend fun setAccelerationZRateSensor(measurementRate: Int) =
+        sensorLabelerDataStore.setAccelerationZRateSensor(measurementRate)
 
     companion object {
         @Volatile private var INSTANCE : SensorLabelerRepository ? = null

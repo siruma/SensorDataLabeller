@@ -38,9 +38,8 @@ class MainActivity : ComponentActivity() {
     //Measurement values
     private var heartRate = 0
     private var time = 0
-    private var gyro = 0
-    private var accelerationX = 0
-    private var accelerationY = 0
+    private val gyro : IntArray = IntArray(3)
+    private var acceleration : IntArray = IntArray(3)
     private var gpsValue = 0
 
     private var foregroundOnlyServiceBound = false
@@ -69,22 +68,38 @@ class MainActivity : ComponentActivity() {
 
         mainViewModel.heartRateFlow.observe(this) { measurement ->
             heartRate = measurement
-            updateHeartRate(heartRate)
+            //updateHeartRate(heartRate)
         }
 
-        mainViewModel.gyroRateFlow.observe(this) {measurement ->
-            gyro = measurement
+        mainViewModel.gyroXRateFlow.observe(this) {measurement ->
+            gyro[0] = measurement
+            updateGyro(gyro)
+        }
+        mainViewModel.gyroYRateFlow.observe(this) {measurement ->
+            gyro[1] = measurement
+            updateGyro(gyro)
+        }
+        mainViewModel.gyroZRateFlow.observe(this) {measurement ->
+            gyro[2] = measurement
             updateGyro(gyro)
         }
 
-        mainViewModel.accelerationFlow.observe(this) {measurement ->
-            accelerationX = measurement
-            updateAcceleration(accelerationX)
+        mainViewModel.accelerationXFlow.observe(this) {measurement ->
+            acceleration[0] = measurement
+            //updateAcceleration(accelerationX)
+        }
+        mainViewModel.accelerationYFlow.observe(this) {measurement ->
+            acceleration[1] = measurement
+            //updateAcceleration(accelerationX)
+        }
+        mainViewModel.accelerationZFlow.observe(this) {measurement ->
+            acceleration[2] = measurement
+            //updateAcceleration(accelerationX)
         }
 
         mainViewModel.timeStampFlow.observe(this) { measurement ->
             time = measurement
-            updateTimeStamp(time)
+            //updateTimeStamp(time)
         }
 
         mainViewModel.activeSensorLabelerFlow.observe(this) { active ->
@@ -209,17 +224,17 @@ class MainActivity : ComponentActivity() {
         val output = getString(R.string.heart_rate_text, measurement)
         binding.outputTextView.text = output
     }
-    private fun updateAcceleration(measurement: Int) {
+    private fun updateAcceleration(measurement: IntArray) {
         Log.d(TAG, "updateAcceleration()")
-        Log.d(TAG, "Acceleration: $measurement")
-        val output = getString(R.string.acceleration_rate_text, measurement)
+        Log.d(TAG, "Acceleration: ${measurement[0]}, ${measurement[1]},${measurement[2]}")
+        val output = getString(R.string.acceleration_rate_text, measurement[0], measurement[1], measurement[2])
         binding.outputTextView.text = output
     }
 
-    private fun updateGyro(measurement: Int) {
+    private fun updateGyro(measurement: IntArray) {
         Log.d(TAG, "updateGyro()")
-        Log.d(TAG, "Gyro rate: $measurement")
-        val output = getString(R.string.gyro_rate_text, measurement)
+        Log.d(TAG, "Gyro rate: ${measurement[0]}, ${measurement[1]},${measurement[2]}")
+        val output = getString(R.string.gyro_rate_text, measurement[0], measurement[1], measurement[2])
         binding.outputTextView.text = output
     }
 
