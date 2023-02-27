@@ -2,11 +2,9 @@ package com.sensordatalabeler.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
+import com.sensordatalabeler.data.db.MyLocationEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -56,6 +54,17 @@ class SensorLabelerDataStore(private val context: Context) {
     }
     val accelerationZRateSensorFlow: Flow<Int> = context.dataStore.data.map {
         it[ACCELERATION_Z_RATE_POINTS_KEY] ?: 0
+    }
+
+    // LOCATION
+    val latitudeSensorFlow: Flow<Double> = context.dataStore.data.map {
+            it[LOCATION_LATITUDE_KEY] ?: 0.0
+    }
+    val longitudeSensorFlow: Flow<Double> = context.dataStore.data.map {
+        it[LOCATION_LONGITUDE_KEY] ?: 0.0
+    }
+    val dateSensorFlow: Flow<Long> = context.dataStore.data.map {
+        it[LOCATION_DATE_KEY] ?: 0
     }
 
     // SET FUNCTIONS
@@ -122,6 +131,15 @@ class SensorLabelerDataStore(private val context: Context) {
         }
     }
 
+    // LOCATION
+    suspend fun setLocationSensor(locationEntity: MyLocationEntity) {
+        context.dataStore.edit {
+            it[LOCATION_LONGITUDE_KEY] = locationEntity.getLongitude()
+            it[LOCATION_LATITUDE_KEY] = locationEntity.getLatitude()
+            it[LOCATION_DATE_KEY] = locationEntity.getDate()
+        }
+    }
+
     companion object {
         private const val SENSOR_LABELER_DATASTORE_NAME = "sensor_labeler_datastore"
         private val ACTIVE_SENSOR_LABELER_KEY = booleanPreferencesKey("active_sensor_labeler")
@@ -132,6 +150,10 @@ class SensorLabelerDataStore(private val context: Context) {
         private val HEART_BEAT_POINTS_KEY = intPreferencesKey("heart_beat_points")
         // STEP COUNTER
         private val STEP_COUNTER_POINTS_KEY = intPreferencesKey("step_counter_points")
+        // LOCATION
+        private val LOCATION_LONGITUDE_KEY = doublePreferencesKey("location_longitude")
+        private val LOCATION_LATITUDE_KEY = doublePreferencesKey("location_latitude")
+        private val LOCATION_DATE_KEY = longPreferencesKey("location_date")
 
 
         // GYRO RATE

@@ -19,6 +19,11 @@ class MainViewModel(sensorLabelerRepository: SensorLabelerRepository) : ViewMode
     val accelerationXFlow = sensorLabelerRepository.accelerationXRateSensorFlow.asLiveData()
     val accelerationYFlow = sensorLabelerRepository.accelerationYRateSensorFlow.asLiveData()
     val accelerationZFlow = sensorLabelerRepository.accelerationZRateSensorFlow.asLiveData()
+
+    // LOCATION
+    val longitudeFlow = sensorLabelerRepository.longitudeSensorFlow.asLiveData()
+    val latitudeFlow = sensorLabelerRepository.latitudeSensorFlow.asLiveData()
+    val dateFlow = sensorLabelerRepository.dateSensorFlow.asLiveData()
 }
 
 class MainViewModelFactory(

@@ -6,11 +6,14 @@ import android.content.Intent
 import android.util.Log
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
+import com.sensordatalabeler.data.LocationManager
+import com.sensordatalabeler.data.SensorLabelerRepository
 import com.sensordatalabeler.data.db.MyLocationEntity
 import java.util.*
 
 class LocationUpdateBroadcastReceiver : BroadcastReceiver() {
 
+    private var locationEntity =  MyLocationEntity(0.0,0.0,Date(0))
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "onReceive() context:$context, intent:$intent")
 
@@ -34,11 +37,16 @@ class LocationUpdateBroadcastReceiver : BroadcastReceiver() {
                 }
                 if (locations.isNotEmpty()) {
                     //TODO LocationRepository
-                    //LocationRepository.getInstance(context, Executors.newSingleThreadExecutor())
-                    //    .addLocations(locations)
+                    Log.d(TAG, "Location: ${locations.last().getString()}")
+
+                    LocationManager.locationEntity = locations.last()
                 }
             }
         }
+    }
+
+    fun getLocationEntity(): MyLocationEntity {
+        return locationEntity
     }
     companion object {
         private const val TAG = "LUBroadcastReceiver"

@@ -1,5 +1,24 @@
 package com.sensordatalabeler.data.db
 
-class MyLocationEntity(latitude: Double, longitude: Double, date: Any) {
+import java.util.Date
 
+class MyLocationEntity(latitude: Double, longitude: Double, date: Date) {
+
+    private val myLatitude = latitude
+    private val myLongitude = longitude
+    private val myDate = date
+
+    fun getLatitude() : Double {
+        return myLatitude
+    }
+    fun getLongitude() : Double {
+        return myLongitude
+    }
+    fun getDate() : Long {
+        return myDate.time
+    }
+
+    fun getString() : String {
+        return "($myLatitude, $myLongitude, $myDate)"
+    }
 }

@@ -1,27 +1,26 @@
 package com.sensordatalabeler
 
 
-import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Binder
 import android.os.IBinder
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.CATEGORY_WORKOUT
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.wear.ongoing.OngoingActivity
 import androidx.wear.ongoing.Status
+import com.sensordatalabeler.data.LocationManager
 import com.sensordatalabeler.data.SensorLabelerRepository
+import com.sensordatalabeler.sensor.LocationUpdateBroadcastReceiver
 import com.sensordatalabeler.sensor.SensorActivityService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -33,8 +32,12 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         (application as MainApp).repository
     }
 
+    // LOCATION
+    private lateinit var locationReceiver: LocationManager
+
     private lateinit var notificationManager: NotificationManager
 
+    // BODY Sensors
     private lateinit var heartRateSensor: SensorActivityService
     private lateinit var gyroRateSensor: SensorActivityService
     private lateinit var accelerationRateSensor: SensorActivityService
@@ -64,6 +67,8 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
             }
         }
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        locationReceiver = LocationManager.getInstance(this)
 
         heartRateSensor = SensorActivityService().onCreate(
             getSystemService(SENSOR_SERVICE) as SensorManager,
@@ -137,7 +142,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
     }
 
     private fun notForegroundService() {
-        stopForeground(true)
+        //stopForeground(true)
         serviceRunForeground = false
         confChange = false
     }
@@ -150,10 +155,10 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         gyroRateSensor.startMeasurement(0)
         accelerationRateSensor.startMeasurement(0)
         stepCounterSensor.startMeasurement(0)
+        locationReceiver.startLocationUpdates()
         startService(Intent(applicationContext, ForegroundOnlySensorLabelerService::class.java))
-        //TODO subscribe to location and sensor callbacks here
+        //subscribe to location and sensor callbacks here
         dataFromSensorJob = lifecycleScope.launch {
-            startLocationClient()
             readSensorData()
         }
     }
@@ -172,6 +177,9 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
                 sensorLabelerRepository.setAccelerationYRateSensor(intArray[1])
                 sensorLabelerRepository.setAccelerationZRateSensor(intArray[2])}
             stepCounterSensor.let { sensorLabelerRepository.setStepCounterSensor(it.getMeasurementRate()[0]) }
+            locationReceiver.let {
+                sensorLabelerRepository.setLocationsSensor(it.getLocationEntity())
+            }
             delay(THREE_SECONDS_MILLISECONDS)
         }
     }
@@ -187,6 +195,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         gyroRateSensor.stopMeasure()
         accelerationRateSensor.stopMeasure()
         dataFromSensorJob?.cancel()
+        locationReceiver.stopLocationUpdates()
 
         lifecycleScope.launch {
             val job: Job = setActiveSensorLabeler(false)
@@ -198,32 +207,6 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         }
     }
 
-    private fun startLocationClient() {
-        Log.d(TAG, "startLocationClient()")
-        //TODO Location Client
-        if (!checkPermissions()) {
-            //requestPermissions()
-        }
-    }
-
-    private fun checkPermissions(): Boolean {
-        return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
-            this,
-            ACCESS_FINE_LOCATION
-        )
-    }
-
-    private fun requestPermissions() {
-        //TODO FIX permission request
-        val permissionRational = ActivityCompat.shouldShowRequestPermissionRationale(
-            applicationContext as Activity, ACCESS_FINE_LOCATION
-        )
-
-        if (permissionRational) {
-            Log.i(TAG, "Displaying permission rationale to provide additional context.")
-            //TODO
-        }
-    }
 
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun generateNotification(mainText: String): Notification {

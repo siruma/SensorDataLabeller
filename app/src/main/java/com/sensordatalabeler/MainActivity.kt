@@ -11,6 +11,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import com.sensordatalabeler.databinding.ActivityMainBinding
+import java.text.DateFormat
+import java.util.*
 
 class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -41,7 +43,9 @@ class MainActivity : ComponentActivity() {
     private val gyro : IntArray = IntArray(3)
     private val acceleration : IntArray = IntArray(3)
     private var steps = 0
-    private var gpsValue = 0
+    private var longitude = 0.0
+    private var latitude = 0.0
+    private var date = Date()
 
     private var foregroundOnlyServiceBound = false
 
@@ -69,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
         mainViewModel.heartRateFlow.observe(this) { measurement ->
             heartRate = measurement
-            updateHeartRate(heartRate)
+            //updateHeartRate(heartRate)
         }
 
         mainViewModel.gyroXRateFlow.observe(this) {measurement ->
@@ -112,6 +116,17 @@ class MainActivity : ComponentActivity() {
             Log.d(TAG, "Sensor Status change: $activeSensorLabeler")
             activeSensorLabeler = active
         }
+
+        mainViewModel.latitudeFlow.observe(this) {latitudeData ->
+            latitude = latitudeData
+            updateGPS()
+        }
+        mainViewModel.longitudeFlow.observe(this) {longitudeData ->
+            longitude = longitudeData
+        }
+        mainViewModel.dateFlow.observe(this) {dateSensor ->
+            date = Date(dateSensor)
+    }
     }
 
     override fun onStart() {
@@ -220,10 +235,6 @@ class MainActivity : ComponentActivity() {
         binding.outputTextView.text = output
     }
 
-    private fun updateTimeStamp(timeStamp: Int) {
-        Log.d(TAG, "updateTimeStamp()")
-        val output = getString(R.string.time_stamp_text, timeStamp)
-    }
 
     private fun updateOutput(measurement: Int) {
         Log.d(TAG, "updateOutput()")
@@ -241,6 +252,13 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "updateGyro()")
         Log.d(TAG, "Gyro rate: ${measurement[0]}, ${measurement[1]},${measurement[2]}")
         val output = getString(R.string.gyro_rate_text, measurement[0], measurement[1], measurement[2])
+        binding.outputTextView.text = output
+    }
+
+    private fun updateGPS() {
+        Log.d(TAG, "updateGPS()")
+        Log.d(TAG, "GPS: ${latitude}, ${longitude},$date")
+        val output = getString(R.string.gps_text, latitude, longitude, date)
         binding.outputTextView.text = output
     }
 

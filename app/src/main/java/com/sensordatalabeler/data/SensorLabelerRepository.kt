@@ -1,6 +1,8 @@
 package com.sensordatalabeler.data
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import com.sensordatalabeler.data.db.MyLocationEntity
 import kotlinx.coroutines.flow.Flow
 
 class SensorLabelerRepository private constructor(
@@ -28,22 +30,26 @@ class SensorLabelerRepository private constructor(
     val gyroYRateSensorFlow: Flow<Int> = sensorLabelerDataStore.gyroYRateSensorFlow
     val gyroZRateSensorFlow: Flow<Int> = sensorLabelerDataStore.gyroZRateSensorFlow
 
-     suspend fun setGyroXRateSensor(gyroRate: Int) =
-             sensorLabelerDataStore.setGyroXRateSensor(gyroRate)
+    suspend fun setGyroXRateSensor(gyroRate: Int) =
+        sensorLabelerDataStore.setGyroXRateSensor(gyroRate)
+
     suspend fun setGyroYRateSensor(gyroRate: Int) =
         sensorLabelerDataStore.setGyroYRateSensor(gyroRate)
+
     suspend fun setGyroZRateSensor(gyroRate: Int) =
-            sensorLabelerDataStore.setGyroZRateSensor(gyroRate)
+        sensorLabelerDataStore.setGyroZRateSensor(gyroRate)
 
 
     // ACCELERATION RATE
-    val accelerationXRateSensorFlow : Flow<Int> = sensorLabelerDataStore.accelerationXRateSensorFlow
-    val accelerationYRateSensorFlow : Flow<Int> = sensorLabelerDataStore.accelerationYRateSensorFlow
-    val accelerationZRateSensorFlow : Flow<Int> = sensorLabelerDataStore.accelerationZRateSensorFlow
+    val accelerationXRateSensorFlow: Flow<Int> = sensorLabelerDataStore.accelerationXRateSensorFlow
+    val accelerationYRateSensorFlow: Flow<Int> = sensorLabelerDataStore.accelerationYRateSensorFlow
+    val accelerationZRateSensorFlow: Flow<Int> = sensorLabelerDataStore.accelerationZRateSensorFlow
     suspend fun setAccelerationXRateSensor(measurementRate: Int) =
         sensorLabelerDataStore.setAccelerationXRateSensor(measurementRate)
+
     suspend fun setAccelerationYRateSensor(measurementRate: Int) =
         sensorLabelerDataStore.setAccelerationYRateSensor(measurementRate)
+
     suspend fun setAccelerationZRateSensor(measurementRate: Int) =
         sensorLabelerDataStore.setAccelerationZRateSensor(measurementRate)
 
@@ -52,13 +58,23 @@ class SensorLabelerRepository private constructor(
 
     suspend fun setStepCounterSensor(steps: Int) =
         sensorLabelerDataStore.setStepCounterSensor(steps)
+
+    // LOCATION
+    val longitudeSensorFlow: Flow<Double> = sensorLabelerDataStore.longitudeSensorFlow
+    val latitudeSensorFlow: Flow<Double> = sensorLabelerDataStore.latitudeSensorFlow
+    val dateSensorFlow: Flow<Long> = sensorLabelerDataStore.dateSensorFlow
+     suspend fun setLocationsSensor(locationEntity: MyLocationEntity) =
+        sensorLabelerDataStore.setLocationSensor(locationEntity)
+
     companion object {
-        @Volatile private var INSTANCE : SensorLabelerRepository ? = null
+        @Volatile
+        private var INSTANCE: SensorLabelerRepository? = null
 
         fun getInstance(context: Context): SensorLabelerRepository {
-            return INSTANCE ?: synchronized(this){
+            return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: SensorLabelerRepository(
-                    SensorLabelerDataStore(context))
+                    SensorLabelerDataStore(context)
+                )
                     .also { INSTANCE = it }
             }
         }
