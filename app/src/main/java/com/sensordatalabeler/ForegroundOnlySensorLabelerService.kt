@@ -20,7 +20,6 @@ import androidx.wear.ongoing.OngoingActivity
 import androidx.wear.ongoing.Status
 import com.sensordatalabeler.data.LocationManager
 import com.sensordatalabeler.data.SensorLabelerRepository
-import com.sensordatalabeler.sensor.LocationUpdateBroadcastReceiver
 import com.sensordatalabeler.sensor.SensorActivityService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -52,6 +51,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
     private var sensorLabelerActive = false
 
     private var dataFromSensorJob: Job? = null
+    private  var locationJob: Job? = null
 
     private fun setActiveSensorLabeler(active: Boolean) = lifecycleScope.launch {
         sensorLabelerRepository.setActiveSensorLabeler(active)
@@ -161,6 +161,9 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         dataFromSensorJob = lifecycleScope.launch {
             readSensorData()
         }
+        locationJob = lifecycleScope.launch {
+            readLocationData()
+        }
     }
 
     private suspend fun readSensorData() {
@@ -177,10 +180,15 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
                 sensorLabelerRepository.setAccelerationYRateSensor(intArray[1])
                 sensorLabelerRepository.setAccelerationZRateSensor(intArray[2])}
             stepCounterSensor.let { sensorLabelerRepository.setStepCounterSensor(it.getMeasurementRate()[0]) }
+            delay(THREE_SECONDS_MILLISECONDS)
+        }
+    }
+    private suspend fun readLocationData() {
+        while (true) {
             locationReceiver.let {
                 sensorLabelerRepository.setLocationsSensor(it.getLocationEntity())
             }
-            delay(THREE_SECONDS_MILLISECONDS)
+            delay(MINUTE_MILLISECONDS)
         }
     }
 
@@ -196,6 +204,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         accelerationRateSensor.stopMeasure()
         dataFromSensorJob?.cancel()
         locationReceiver.stopLocationUpdates()
+        locationJob?.cancel()
 
         lifecycleScope.launch {
             val job: Job = setActiveSensorLabeler(false)
@@ -270,6 +279,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         private const val TAG = "ForegroundOnlyService"
 
         private const val THREE_SECONDS_MILLISECONDS = 3000L
+        private const val MINUTE_MILLISECONDS = 60000L
 
         private const val PACKAGE_NAME = "com.sensordatalabeler"
 

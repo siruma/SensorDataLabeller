@@ -11,7 +11,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import com.sensordatalabeler.databinding.ActivityMainBinding
-import java.text.DateFormat
 import java.util.*
 
 class MainActivity : ComponentActivity() {
@@ -28,7 +27,6 @@ class MainActivity : ComponentActivity() {
                 if (newActiveStatus) {
                     binding.startStopWorkoutButton.text =
                         getString(R.string.stop_sensor_button_text)
-                    updateOutput(heartRate)
                 } else {
                     binding.startStopWorkoutButton.text =
                         getString(R.string.start_sensor_button_text)
@@ -46,6 +44,8 @@ class MainActivity : ComponentActivity() {
     private var longitude = 0.0
     private var latitude = 0.0
     private var date = Date()
+
+    private var activeMeasurement = false
 
     private var foregroundOnlyServiceBound = false
 
@@ -73,53 +73,45 @@ class MainActivity : ComponentActivity() {
 
         mainViewModel.heartRateFlow.observe(this) { measurement ->
             heartRate = measurement
-            //updateHeartRate(heartRate)
+            if (activeMeasurement){
+                updateHeartRate(heartRate)
+                }
         }
 
         mainViewModel.gyroXRateFlow.observe(this) {measurement ->
             gyro[0] = measurement
-            //updateGyro(gyro)
         }
         mainViewModel.gyroYRateFlow.observe(this) {measurement ->
             gyro[1] = measurement
-            //updateGyro(gyro)
         }
         mainViewModel.gyroZRateFlow.observe(this) {measurement ->
             gyro[2] = measurement
-            //updateGyro(gyro)
         }
 
         mainViewModel.accelerationXFlow.observe(this) {measurement ->
             acceleration[0] = measurement
-            //updateAcceleration(accelerationX)
         }
         mainViewModel.accelerationYFlow.observe(this) {measurement ->
             acceleration[1] = measurement
-            //updateAcceleration(accelerationX)
         }
         mainViewModel.accelerationZFlow.observe(this) {measurement ->
             acceleration[2] = measurement
-            //updateAcceleration(accelerationX)
         }
 
         mainViewModel.stepCounterFlow.observe(this) {measurement ->
             steps = measurement
-            //updateOutput(steps)
         }
 
         mainViewModel.timeStampFlow.observe(this) { measurement ->
             time = measurement
-            //updateTimeStamp(time)
         }
 
         mainViewModel.activeSensorLabelerFlow.observe(this) { active ->
-            Log.d(TAG, "Sensor Status change: $activeSensorLabeler")
             activeSensorLabeler = active
         }
 
         mainViewModel.latitudeFlow.observe(this) {latitudeData ->
             latitude = latitudeData
-            updateGPS()
         }
         mainViewModel.longitudeFlow.observe(this) {longitudeData ->
             longitude = longitudeData
@@ -148,11 +140,13 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "onClickSensorLabeler()")
         if (activeSensorLabeler) {
             foregroundOnlySensorLabelerService?.stopSensorLabeler()
+            activeMeasurement = false
             binding.saveSensorDataButton.visibility = View.VISIBLE
             binding.nameMeasurement.visibility = View.GONE
             binding.outputTextView.text = getString(R.string.default_greeting_message)
         } else {
             foregroundOnlySensorLabelerService?.startSensorLabeler()
+            activeMeasurement = true
             binding.saveSensorDataButton.visibility = View.GONE
             binding.nameMeasurement.visibility = View.VISIBLE
         }
@@ -232,33 +226,6 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "updateHeartRate()")
         Log.d(TAG, "Heart Rate: $measurement")
         val output = getString(R.string.heart_rate_text, measurement)
-        binding.outputTextView.text = output
-    }
-
-
-    private fun updateOutput(measurement: Int) {
-        Log.d(TAG, "updateOutput()")
-        val output = getString(R.string.step_counter_text, measurement)
-        binding.outputTextView.text = output
-    }
-    private fun updateAcceleration(measurement: IntArray) {
-        Log.d(TAG, "updateAcceleration()")
-        Log.d(TAG, "Acceleration: ${measurement[0]}, ${measurement[1]},${measurement[2]}")
-        val output = getString(R.string.acceleration_rate_text, measurement[0], measurement[1], measurement[2])
-        binding.outputTextView.text = output
-    }
-
-    private fun updateGyro(measurement: IntArray) {
-        Log.d(TAG, "updateGyro()")
-        Log.d(TAG, "Gyro rate: ${measurement[0]}, ${measurement[1]},${measurement[2]}")
-        val output = getString(R.string.gyro_rate_text, measurement[0], measurement[1], measurement[2])
-        binding.outputTextView.text = output
-    }
-
-    private fun updateGPS() {
-        Log.d(TAG, "updateGPS()")
-        Log.d(TAG, "GPS: ${latitude}, ${longitude},$date")
-        val output = getString(R.string.gps_text, latitude, longitude, date)
         binding.outputTextView.text = output
     }
 

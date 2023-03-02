@@ -33,6 +33,7 @@ class LocationManager private constructor(private val context: Context) {
 
     private val locationRequest: LocationRequest =
         LocationRequest.Builder(TimeUnit.SECONDS.toMillis(60))
+            .setIntervalMillis(TimeUnit.SECONDS.toMillis(60))
             .setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(30))
             .setMaxUpdateDelayMillis(TimeUnit.SECONDS.toMillis(2))
             .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
@@ -47,9 +48,10 @@ class LocationManager private constructor(private val context: Context) {
     fun startLocationUpdates() {
         Log.d(TAG, "startLocationUpdates()")
 
-        if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED)
+        if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            Log.d(TAG, "Permission denied")
             return
-
+        }
         try {
             _receivingLocationUpdates.value = true
             fusedLocationClient.requestLocationUpdates(locationRequest, locationUpdatePendingIntent)
@@ -58,6 +60,7 @@ class LocationManager private constructor(private val context: Context) {
             Log.d(TAG, "Location permission revoked; details: $permissionRevoked")
             throw permissionRevoked
         }
+        Log.d(TAG, "Location Update running")
     }
 
     fun stopLocationUpdates() {
@@ -67,6 +70,7 @@ class LocationManager private constructor(private val context: Context) {
     }
 
     fun getLocationEntity(): MyLocationEntity {
+        Log.d(TAG, "getLocationEntity")
         return locationEntity
     }
 
@@ -74,6 +78,7 @@ class LocationManager private constructor(private val context: Context) {
         private const val TAG = "LocationManager"
         var locationEntity =  MyLocationEntity(0.0,0.0,Date(0))
 
+        @SuppressLint("StaticFieldLeak")
         private var INSTANCE: LocationManager? = null
 
         fun getInstance(context: Context): LocationManager {

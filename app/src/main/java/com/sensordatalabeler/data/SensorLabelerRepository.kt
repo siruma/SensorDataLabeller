@@ -1,7 +1,6 @@
 package com.sensordatalabeler.data
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import com.sensordatalabeler.data.db.MyLocationEntity
 import kotlinx.coroutines.flow.Flow
 
