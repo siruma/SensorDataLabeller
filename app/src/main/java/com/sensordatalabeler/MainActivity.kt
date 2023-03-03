@@ -10,12 +10,11 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
-import androidx.wear.widget.WearableRecyclerView
 import com.sensordatalabeler.databinding.ActivityMainBinding
+import java.util.*
 
 class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var recycleView: WearableRecyclerView
 
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModelFactory((application as MainApp).repository)
@@ -28,7 +27,6 @@ class MainActivity : ComponentActivity() {
                 if (newActiveStatus) {
                     binding.startStopWorkoutButton.text =
                         getString(R.string.stop_sensor_button_text)
-                    updateOutput(heartRate)
                 } else {
                     binding.startStopWorkoutButton.text =
                         getString(R.string.start_sensor_button_text)
@@ -40,11 +38,14 @@ class MainActivity : ComponentActivity() {
     //Measurement values
     private var heartRate = 0
     private var time = 0
-    private var gyro = 0
-    private var accelerationX = 0
-    private var accelerationY = 0
-    private var gpsValue = 0
+    private val gyro : IntArray = IntArray(3)
+    private val acceleration : IntArray = IntArray(3)
+    private var steps = 0
+    private var longitude = 0.0
+    private var latitude = 0.0
+    private var date = Date()
 
+    private var activeMeasurement = false
 
     private var foregroundOnlyServiceBound = false
 
@@ -72,18 +73,52 @@ class MainActivity : ComponentActivity() {
 
         mainViewModel.heartRateFlow.observe(this) { measurement ->
             heartRate = measurement
-            updateHeartRate(heartRate)
+            if (activeMeasurement){
+                updateHeartRate(heartRate)
+                }
+        }
+
+        mainViewModel.gyroXRateFlow.observe(this) {measurement ->
+            gyro[0] = measurement
+        }
+        mainViewModel.gyroYRateFlow.observe(this) {measurement ->
+            gyro[1] = measurement
+        }
+        mainViewModel.gyroZRateFlow.observe(this) {measurement ->
+            gyro[2] = measurement
+        }
+
+        mainViewModel.accelerationXFlow.observe(this) {measurement ->
+            acceleration[0] = measurement
+        }
+        mainViewModel.accelerationYFlow.observe(this) {measurement ->
+            acceleration[1] = measurement
+        }
+        mainViewModel.accelerationZFlow.observe(this) {measurement ->
+            acceleration[2] = measurement
+        }
+
+        mainViewModel.stepCounterFlow.observe(this) {measurement ->
+            steps = measurement
         }
 
         mainViewModel.timeStampFlow.observe(this) { measurement ->
             time = measurement
-            updateTimeStamp(time)
         }
 
         mainViewModel.activeSensorLabelerFlow.observe(this) { active ->
-            Log.d(TAG, "Sensor Status change: $activeSensorLabeler")
             activeSensorLabeler = active
         }
+
+        mainViewModel.latitudeFlow.observe(this) {latitudeData ->
+            latitude = latitudeData
+        }
+        mainViewModel.longitudeFlow.observe(this) {longitudeData ->
+            longitude = longitudeData
+        }
+        mainViewModel.dateFlow.observe(this) {dateSensor ->
+            date = Date(dateSensor)
+    }
     }
 
     override fun onStart() {
@@ -105,11 +140,13 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "onClickSensorLabeler()")
         if (activeSensorLabeler) {
             foregroundOnlySensorLabelerService?.stopSensorLabeler()
+            activeMeasurement = false
             binding.saveSensorDataButton.visibility = View.VISIBLE
             binding.nameMeasurement.visibility = View.GONE
             binding.outputTextView.text = getString(R.string.default_greeting_message)
         } else {
             foregroundOnlySensorLabelerService?.startSensorLabeler()
+            activeMeasurement = true
             binding.saveSensorDataButton.visibility = View.GONE
             binding.nameMeasurement.visibility = View.VISIBLE
         }
@@ -187,17 +224,7 @@ class MainActivity : ComponentActivity() {
 
     private fun updateHeartRate(measurement: Int) {
         Log.d(TAG, "updateHeartRate()")
-        val output = getString(R.string.heart_rate_text, measurement)
-        //binding.outputTextView.text = output
-    }
-
-    private fun updateTimeStamp(timeStamp: Int) {
-        Log.d(TAG, "updateTimeStamp()")
-        val output = getString(R.string.time_stamp_text, timeStamp)
-    }
-
-    private fun updateOutput(measurement: Int) {
-        Log.d(TAG, "updateOutput()")
+        Log.d(TAG, "Heart Rate: $measurement")
         val output = getString(R.string.heart_rate_text, measurement)
         binding.outputTextView.text = output
     }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
+import com.sensordatalabeler.data.LocationManager
 import com.sensordatalabeler.data.db.MyLocationEntity
 import java.util.*
 
@@ -26,6 +27,7 @@ class LocationUpdateBroadcastReceiver : BroadcastReceiver() {
 
             LocationResult.extractResult(intent)?.let { locationResult ->
                 val locations = locationResult.locations.map { location ->
+                    Log.d(TAG, "Location: $location")
                     MyLocationEntity(
                         latitude = location.latitude,
                         longitude = location.longitude,
@@ -34,12 +36,14 @@ class LocationUpdateBroadcastReceiver : BroadcastReceiver() {
                 }
                 if (locations.isNotEmpty()) {
                     //TODO LocationRepository
-                    //LocationRepository.getInstance(context, Executors.newSingleThreadExecutor())
-                    //    .addLocations(locations)
+                    Log.d(TAG, "Location: ${locations.last().getString()}")
+
+                    LocationManager.locationEntity = locations.last()
                 }
             }
         }
     }
+
     companion object {
         private const val TAG = "LUBroadcastReceiver"
         private const val PACKAGE_NAME = "com.sensordatalabeler.sensor"
