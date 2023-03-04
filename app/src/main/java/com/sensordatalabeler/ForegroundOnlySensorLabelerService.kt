@@ -24,6 +24,8 @@ import com.sensordatalabeler.sensor.SensorActivityService
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ForegroundOnlySensorLabelerService : LifecycleService() {
 
@@ -166,6 +168,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
     private suspend fun readSensorData() {
         while (true) {
             heartRateSensor.let { sensorLabelerRepository.setHeartRateSensor(it.getMeasurementRate()[0]) }
@@ -180,6 +183,8 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
                 sensorLabelerRepository.setAccelerationYRateSensor(intArray[1])
                 sensorLabelerRepository.setAccelerationZRateSensor(intArray[2])}
             stepCounterSensor.let { sensorLabelerRepository.setStepCounterSensor(it.getMeasurementRate()[0]) }
+            val sdf = SimpleDateFormat("HH_mm_ss")
+            sensorLabelerRepository.setTimeStampSensor(sdf.format(Date()))
             delay(THREE_SECONDS_MILLISECONDS)
         }
     }
