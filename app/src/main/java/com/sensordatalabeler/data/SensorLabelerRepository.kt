@@ -19,9 +19,9 @@ class SensorLabelerRepository private constructor(
         sensorLabelerDataStore.setHeartRateSensor(measurement)
 
     // TIME STAMP
-    val timeStampSensorFlow: Flow<Int> = sensorLabelerDataStore.timeStampSensorFlow
+    val timeStampSensorFlow: Flow<String> = sensorLabelerDataStore.timeStampSensorFlow
 
-    suspend fun setTimeStampSensor(timeStamp: Int) =
+    suspend fun setTimeStampSensor(timeStamp: String) =
         sensorLabelerDataStore.setTimeStampSensor(timeStamp)
 
     // GYRO RATE
