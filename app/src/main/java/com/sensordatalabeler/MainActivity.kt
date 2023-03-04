@@ -155,10 +155,7 @@ class MainActivity : ComponentActivity() {
         if (activeSensorLabeler) {
             foregroundOnlySensorLabelerService?.stopSensorLabeler()
             activeMeasurement = false
-            binding.exportSensorDataButton.visibility = View.VISIBLE
-            binding.nameMeasurement.visibility = View.GONE
-            binding.outputTextView.text = getString(R.string.default_greeting_message)
-            closeFile()
+            nameSensorData()
         } else {
             foregroundOnlySensorLabelerService?.startSensorLabeler()
             activeMeasurement = true
@@ -217,14 +214,18 @@ class MainActivity : ComponentActivity() {
     write data in the file
      */
     private fun saveData() {
-
         val data =
             "$nameOfActivity,$date,${acceleration.toList()},$heartRate,${gyro.toList()},$steps,($latitude,$longitude);"
         bufferedWriter?.write(data)
         bufferedWriter?.newLine()
         Log.d(TAG, "DATA: $data")
+        if (!activeMeasurement)
+            closeFile()
     }
 
+    /*
+    Button function for name sensor
+     */
     fun onClickSensorName(view: View) {
         Log.d(TAG, "onClickSensorName()")
         if (activeSensorLabeler) {
@@ -285,6 +286,11 @@ class MainActivity : ComponentActivity() {
      */
     private fun saveChoice(view: View) {
         binding.mainMenu.visibility = View.VISIBLE
+        if(!activeMeasurement){
+            binding.nameMeasurement.visibility = View.GONE
+            binding.exportSensorDataButton.visibility = View.VISIBLE
+            binding.outputTextView.text = getString(R.string.default_greeting_message)
+        }
         if (binding.nameMenu1.isVisible) {
             binding.nameMenu1.visibility = View.GONE
         } else if (binding.nameMenu2.isVisible) {
