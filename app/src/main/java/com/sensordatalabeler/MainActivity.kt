@@ -180,8 +180,7 @@ class MainActivity : ComponentActivity() {
     private fun openFile() {
         Log.d(TAG, "File opened")
         var os = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-            val sdCard = Environment.getExternalStorageDirectory()
-            val dir = File(sdCard.absolutePath + "/Android/data/com.sensordatalabeler/files/Data")
+            val dir = File(PATH_TO_DATA)
             if (!dir.exists())
                 dir.mkdirs()
             val file = File(dir, fileName + time + fileType)
@@ -193,6 +192,7 @@ class MainActivity : ComponentActivity() {
             openFileOutput(fileName, MODE_PRIVATE)
         }
         bufferedWriter = BufferedWriter(OutputStreamWriter(os))
+
     }
 
     /*
@@ -204,10 +204,38 @@ class MainActivity : ComponentActivity() {
             Log.d(TAG, "Sensor measurement ongoing")
         } else {
             Log.d(TAG, "Sensor data Exported")
-            val output = "Not yet implemented"
-            // TODO Export data nicely by one file or packed
+            val output = "Data Exported"
+            writeMetaData()
+            try {
+                zip(File(PATH_TO_DATA,"Data.zip"), File(PATH_TO_DATA))
+                cleanUp(File(PATH_TO_DATA))
+            } catch (e :IllegalStateException) {
+                zip(File(filesDir,"Data.zip"), filesDir)
+                cleanUp(filesDir)
+            }
             binding.outputTextView.text = output
         }
+    }
+
+    private fun writeMetaData() {
+        val metadata = "[NAME, DATA, ACCELERATION(x,y,z), HEART RATE, GYRO(x,y,z), STEPS, (LATITUDE,LONGITUDE)]"
+        val metaFileName = "metadata.txt"
+        var os = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+            val dir = File(PATH_TO_DATA)
+            if (!dir.exists())
+                dir.mkdirs()
+            val file = File(dir, metaFileName)
+            if (!file.exists())
+                file.createNewFile()
+            FileOutputStream(file)
+        } else {
+            openFileOutput(metaFileName, MODE_PRIVATE)
+        }
+
+        var bw = BufferedWriter(OutputStreamWriter(os))
+        bw.write(metadata)
+        bw.close()
+
     }
 
     /*
@@ -325,5 +353,6 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        private val PATH_TO_DATA = "${Environment.getExternalStorageDirectory()}/Android/data/com.sensordatalabeler/files/Data"
     }
 }
