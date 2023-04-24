@@ -12,15 +12,21 @@ import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentActivity
+
+import androidx.wear.ambient.AmbientModeSupport
 import com.sensordatalabeler.databinding.ActivityMainBinding
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvider{
     private lateinit var binding: ActivityMainBinding
+    private lateinit var ambientController: AmbientModeSupport.AmbientController
 
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModelFactory((application as MainApp).repository)
@@ -81,6 +87,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        ambientController = AmbientModeSupport.attach(this)
+        Log.d(TAG,"Is Ambient: ${ambientController.isAmbient}")
 
         mainViewModel.heartRateFlow.observe(this) { measurement ->
             heartRate = measurement
@@ -88,6 +96,7 @@ class MainActivity : ComponentActivity() {
                 updateHeartRate(heartRate)
             }
         }
+
 
         mainViewModel.gyroXRateFlow.observe(this) { measurement ->
             gyro[0] = measurement
@@ -180,9 +189,12 @@ class MainActivity : ComponentActivity() {
     private fun openFile() {
         Log.d(TAG, "File opened")
         var os = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-            val dir = File(PATH_TO_DATA)
+            val dir = File(applicationContext.getExternalFilesDir(null),"/Data")
+            Log.d(TAG, "Path: ${dir.path}")
+            Log.d(TAG, "Dir exists: ${dir.exists()}")
             if (!dir.exists())
-                dir.mkdirs()
+                Files.createDirectories(Paths.get(dir.path))
+            Log.d(TAG, "Dir exists: ${dir.exists()}")
             val file = File(dir, fileName + time + fileType)
             if (!file.exists())
                 file.createNewFile()
@@ -354,5 +366,20 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private val PATH_TO_DATA = "${Environment.getExternalStorageDirectory()}/Android/data/com.sensordatalabeler/files/Data"
+    }
+
+    override fun getAmbientCallback(): AmbientModeSupport.AmbientCallback = MyAmbientCallBack()
+    private class MyAmbientCallBack : AmbientModeSupport.AmbientCallback() {
+        override fun onEnterAmbient(ambientDetails: Bundle?) {
+            super.onEnterAmbient(ambientDetails)
+        }
+
+        override fun onExitAmbient() {
+            super.onExitAmbient()
+        }
+
+        override fun onUpdateAmbient() {
+            super.onUpdateAmbient()
+        }
     }
 }
