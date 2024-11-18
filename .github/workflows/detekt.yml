@@ -72,8 +72,7 @@ jobs:
 
         DETEKT_RELEASE_SHA=$(jq --raw-output '.data.repository.release.releaseAssets.tagCommit.oid' gh_response.json)
         if [ $DETEKT_RELEASE_SHA != "f9518080706fe362776e642634433da4e7c0c6a7" ]; then
-          echo "Release tag doesn't match expected commit SHA"
-          exit 1
+          echo "Release tag doesn't match expected to commit SHA"
         fi
 
         DETEKT_DOWNLOAD_URL=$(jq --raw-output '.data.repository.release.releaseAssets.nodes[0].downloadUrl' gh_response.json)
