@@ -7,18 +7,21 @@ import java.util.Date
  * Measurement Values Class.
  * This Class will contain at least 10 measurement.
  */
-class MeasurementValues() {
+class MeasurementValues {
+
+    private val length = 3
+    private val numberOfDatapoint = 10
 
     private var activeMeasurement = false
     private var heartRate = 0
     private var time = ""
-    private var gyro: IntArray = IntArray(3)
-    private var acceleration: IntArray = IntArray(3)
+    private var gyro: IntArray = IntArray(length)
+    private var acceleration: IntArray = IntArray(length)
     private var steps = 0
     private var location: DoubleArray = DoubleArray(2)
     private var date = Date()
     private var nameOfActivity = "NO NAME"
-    private var valuesArray = Array(10) { "" }
+    private var valuesArray = Array(numberOfDatapoint) { "" }
     private var mNumber = 0
 
     /**
@@ -28,6 +31,9 @@ class MeasurementValues() {
      * @param value value of measurement
      */
     fun addMeasurement(type: String, value: Any) {
+        if (this.mNumber > numberOfDatapoint) {
+            this.mNumber = 0
+        }
         when (type) {
             "heartRate" -> this.heartRate = value as Int
             "steps" -> this.steps = value as Int
@@ -40,9 +46,6 @@ class MeasurementValues() {
             "${this.nameOfActivity},${this.date},${this.acceleration.toList()}," +
                     "${this.heartRate},${this.gyro.toList()},${this.steps},${this.location.toList()};"
         this.mNumber += 1
-        if (this.mNumber > 9) {
-            this.mNumber = 0
-        }
     }
 
     /**
@@ -106,7 +109,7 @@ class MeasurementValues() {
      */
     fun resetData() {
         Log.d(TAG, "Data reset")
-        this.valuesArray = Array(10) { "" }
+        this.valuesArray = Array(numberOfDatapoint) { "" }
         this.mNumber = 0
     }
 

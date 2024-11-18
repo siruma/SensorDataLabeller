@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.Environment
 import android.os.IBinder
 import android.util.Log
 import android.view.View
@@ -14,18 +13,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
-
 import androidx.wear.ambient.AmbientModeSupport
 import com.sensordatalabeler.databinding.ActivityMainBinding
+import com.sensordatalabeler.file.WriteFile
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStreamWriter
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.Date
 
 /**
@@ -54,14 +47,8 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
             }
         }
 
-    // File
-    private var fileName = "data"
-    private var fileType = ".csv"
-
     //Measurement values
     private val measurementValues = MeasurementValues()
-
-    private var bufferedWriter: BufferedWriter? = null
 
     private var activeMeasurement = false
 
@@ -184,42 +171,8 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
             measurementValues.setActiveMeasurement(true)
             binding.exportSensorDataButton.visibility = View.GONE
             binding.nameMeasurement.visibility = View.VISIBLE
-            openFile()
+            WriteFile.openFile(measurementValues, applicationContext)
         }
-    }
-
-    /**
-     * Closed the file
-     */
-    private fun closeFile() {
-        Log.d(TAG, "File Closed")
-        bufferedWriter?.close()
-    }
-
-
-    /**
-     * Opens the file to write.
-     */
-    private fun openFile() {
-        Log.d(TAG, "File opened")
-        val time = measurementValues.getTime()
-        val os = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-            val dir = File(applicationContext.getExternalFilesDir(null), "/Data")
-            Log.d(TAG, "Path: ${dir.path}")
-            Log.d(TAG, "Dir exists: ${dir.exists()}")
-            if (!dir.exists())
-                Files.createDirectories(Paths.get(dir.path))
-            Log.d(TAG, "Dir exists: ${dir.exists()}")
-            val file = File(dir, fileName + time + fileType)
-            if (!file.exists())
-                file.createNewFile()
-            Log.d(TAG, "Write in sdcard")
-            FileOutputStream(file)
-        } else {
-            openFileOutput(fileName, MODE_PRIVATE)
-        }
-        bufferedWriter = BufferedWriter(OutputStreamWriter(os))
-
     }
 
     /**
@@ -232,62 +185,10 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         } else {
             Log.d(TAG, "Sensor data Exported")
             val output = "Data Exported"
-            writeMetaData()
-            try {
-                zip(File(PATH_TO_DATA, "Data.zip"), File(PATH_TO_DATA))
-                cleanUp(File(PATH_TO_DATA))
-            } catch (e: IllegalStateException) {
-                zip(File(filesDir, "Data.zip"), filesDir)
-                cleanUp(filesDir)
-            }
+            WriteFile.writeMetaData(applicationContext)
+            WriteFile.writeZip(filesDir)
             binding.outputTextView.text = output
         }
-    }
-
-    /**
-     * Write META data.
-     */
-    private fun writeMetaData() {
-        val metadata =
-            "[NAME, DATA, ACCELERATION(x,y,z), HEART RATE, GYRO(x,y,z), STEPS, (LATITUDE,LONGITUDE)]"
-        val metaFileName = "metadata.txt"
-        val os = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-            val dir = File(PATH_TO_DATA)
-            if (!dir.exists())
-                dir.mkdirs()
-            val file = File(dir, metaFileName)
-            if (!file.exists())
-                file.createNewFile()
-            FileOutputStream(file)
-        } else {
-            openFileOutput(metaFileName, MODE_PRIVATE)
-        }
-
-        val bw = BufferedWriter(OutputStreamWriter(os))
-        bw.write(metadata)
-        bw.close()
-
-    }
-
-    /**
-     * Write data in the file
-     */
-    private fun saveData() {
-        val nonEmptyData = measurementValues.getData().filter { it.isNotEmpty() }
-
-        if (bufferedWriter == null) {
-            Log.e(TAG, "BufferedWriter is null, data cannot be saved.")
-            return
-        }
-
-        for (data in nonEmptyData) {
-            bufferedWriter!!.write(data)
-            bufferedWriter!!.newLine()
-            Log.d(TAG, "DATA: $data")
-        }
-        measurementValues.resetData()
-        if (!measurementValues.getActiveMeasurement())
-            closeFile()
     }
 
     /**
@@ -368,8 +269,7 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         val b = view as Button
         measurementValues.setNameOfActivity(b.text.toString())
         Log.d(TAG, "NAME: $measurementValues.nameOfActivity")
-        saveData()
-
+        WriteFile.saveData(measurementValues)
     }
 
     /**
@@ -392,8 +292,6 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
 
     companion object {
         private const val TAG = "MainActivity"
-        private val PATH_TO_DATA =
-            "${Environment.getExternalStorageDirectory()}/Android/data/com.sensordatalabeler/files/Data"
     }
 
     override fun getAmbientCallback(): AmbientModeSupport.AmbientCallback = MyAmbientCallBack()
