@@ -8,7 +8,11 @@ import com.sensordatalabeler.data.db.MyLocationEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-
+/**
+ * Sensor labeler data store.
+ *
+ * @param context App context
+ */
 class SensorLabelerDataStore(private val context: Context) {
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
@@ -69,69 +73,99 @@ class SensorLabelerDataStore(private val context: Context) {
 
     // SET FUNCTIONS
 
-    // ACTIVE SENSOR
+    /**
+     * Setter for ACTIVE SENSOR
+     */
     suspend fun setActiveSensorLabeler(activeSensorLabeler: Boolean) {
         context.dataStore.edit {
             it[ACTIVE_SENSOR_LABELER_KEY] = activeSensorLabeler
         }
     }
 
-    // TIME STAMP
+    /**
+     * Setter for TIME STAMP
+     */
     suspend fun setTimeStampSensor(timeStamp: String) {
         context.dataStore.edit {
             it[TIME_STAMP_POINT_KEY] = timeStamp
         }
     }
 
-    // HEART RATE
+    /**
+     * Setter for HEART RATE
+     */
     suspend fun setHeartRateSensor(measurement: Int){
         context.dataStore.edit {
             it[HEART_BEAT_POINTS_KEY] = measurement
         }
     }
 
-    // STEP COUNTER
+    /**
+     * Setter for STEP COUNTER
+     */
     suspend fun setStepCounterSensor(measurement: Int){
         context.dataStore.edit {
             it[STEP_COUNTER_POINTS_KEY] = measurement
         }
     }
 
-    // GYRO RATE
+    /**
+     * Setter for GYRO RATE X
+     */
     suspend fun setGyroXRateSensor(measurement: Int){
         context.dataStore.edit {
             it[GYRO_X_RATE_POINTS_KEY] = measurement
         }
     }
+
+    /**
+     * Setter for GYRO RATE Y
+     */
     suspend fun setGyroYRateSensor(measurement: Int){
         context.dataStore.edit {
             it[GYRO_Y_RATE_POINTS_KEY] = measurement
         }
     }
+
+    /**
+     * Setter for GYRO RATE Z
+     */
     suspend fun setGyroZRateSensor(measurement: Int){
         context.dataStore.edit {
             it[GYRO_Z_RATE_POINTS_KEY] = measurement
         }
     }
 
-    // ACCELERATION RATE
+    /**
+     * Setter for ACCELERATION RATE X
+     */
     suspend fun setAccelerationXRateSensor(measurementRate: Int) {
         context.dataStore.edit {
             it[ACCELERATION_X_RATE_POINTS_KEY] = measurementRate
         }
     }
+
+    /**
+     * Setter for ACCELERATION RATE Y
+     */
     suspend fun setAccelerationYRateSensor(measurementRate: Int) {
         context.dataStore.edit {
             it[ACCELERATION_Y_RATE_POINTS_KEY] = measurementRate
         }
     }
+
+    /**
+     * Setter for ACCELERATION RATE Z
+     */
     suspend fun setAccelerationZRateSensor(measurementRate: Int) {
         context.dataStore.edit {
             it[ACCELERATION_Z_RATE_POINTS_KEY] = measurementRate
         }
     }
 
-    // LOCATION
+    /**
+     * Setter for LOCATION
+     */
     suspend fun setLocationSensor(locationEntity: MyLocationEntity) {
         context.dataStore.edit {
             it[LOCATION_LONGITUDE_KEY] = locationEntity.getLongitude()

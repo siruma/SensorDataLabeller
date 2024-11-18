@@ -1,8 +1,11 @@
 package com.sensordatalabeler
 
-
-import android.annotation.SuppressLint
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -27,6 +30,9 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Foreground Only sensor service.
+ */
 class ForegroundOnlySensorLabelerService : LifecycleService() {
 
     private val sensorLabelerRepository: SensorLabelerRepository by lazy {
@@ -55,10 +61,18 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
     private var dataFromSensorJob: Job? = null
     private  var locationJob: Job? = null
 
+    /**
+     * Setter Status of Sensor labeler.
+     *
+     * @param active Status of Sensor labaler
+     */
     private fun setActiveSensorLabeler(active: Boolean) = lifecycleScope.launch {
         sensorLabelerRepository.setActiveSensorLabeler(active)
     }
 
+    /**
+     * Create sensors and other instances,
+     */
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate()")
@@ -96,6 +110,13 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
 
     }
 
+    /**
+     * On start
+     *
+     * @param intent
+     * @param flags
+     * @param startId
+     */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         Log.d(TAG, "onStartCommand()")
@@ -108,9 +129,14 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
             stopSensorLabelerWithServiceShutdownOption(true)
         }
         //Stop the system start a new service after it's been killed
-        return Service.START_NOT_STICKY
+        return START_NOT_STICKY
     }
 
+    /**
+     * On bind.
+     *
+     * @param intent
+     */
     override fun onBind(intent: Intent): IBinder {
         super.onBind(intent)
         Log.d(TAG, "onBind()")
@@ -118,12 +144,22 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         return localBinder
     }
 
+    /**
+     * On rebind
+     *
+     * @param intent
+     */
     override fun onRebind(intent: Intent?) {
         super.onRebind(intent)
         Log.d(TAG, "onRebind()")
         notForegroundService()
     }
 
+    /**
+     * On unbind
+     *
+     * @param intent
+     */
     override fun onUnbind(intent: Intent?): Boolean {
         super.onUnbind(intent)
         Log.d(TAG, "onUnbind()")
@@ -138,17 +174,28 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         return true
     }
 
+    /**
+     * On configuration changed
+     *
+     * @param newConfig
+     */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         confChange = true
     }
 
+    /**
+     * Setter for not foreground service booleans
+     */
     private fun notForegroundService() {
         //stopForeground(true)
         serviceRunForeground = false
         confChange = false
     }
 
+    /**
+     * Start sensor labeler service.
+     */
     fun startSensorLabeler() {
         Log.d(TAG, "startSensorLabeler()")
 
@@ -168,7 +215,9 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
+    /**
+     * Read the sensor data.
+     */
     private suspend fun readSensorData() {
         while (true) {
             heartRateSensor.let { sensorLabelerRepository.setHeartRateSensor(it.getMeasurementRate()[0]) }
@@ -183,11 +232,15 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
                 sensorLabelerRepository.setAccelerationYRateSensor(intArray[1])
                 sensorLabelerRepository.setAccelerationZRateSensor(intArray[2])}
             stepCounterSensor.let { sensorLabelerRepository.setStepCounterSensor(it.getMeasurementRate()[0]) }
-            val sdf = SimpleDateFormat("HH_mm_ss")
+            val sdf = SimpleDateFormat("HH_mm_ss", Locale.ENGLISH)
             sensorLabelerRepository.setTimeStampSensor(sdf.format(Date()))
             delay(THREE_SECONDS_MILLISECONDS)
         }
     }
+
+    /**
+     * Read the location Data.
+     */
     private suspend fun readLocationData() {
         while (true) {
             locationReceiver.let {
@@ -197,11 +250,19 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         }
     }
 
+    /**
+     * Stop the sensor labeler.
+     */
     fun stopSensorLabeler() {
         Log.d(TAG, "stopSensorLabeler")
         stopSensorLabelerWithServiceShutdownOption(false)
     }
 
+    /**
+     * Stop Service with service shut option.
+     *
+     * @param stopService Stop the Data store service
+     */
     private fun stopSensorLabelerWithServiceShutdownOption(stopService: Boolean) {
         Log.d(TAG, "stopSensorLabelerWithServiceShutdownOption()")
         heartRateSensor.stopMeasure()
@@ -221,8 +282,11 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         }
     }
 
-
-    @SuppressLint("UnspecifiedImmutableFlag")
+    /**
+     * Generate notifications
+     *
+     * @param mainText The notification text
+     */
     private fun generateNotification(mainText: String): Notification {
         Log.d(TAG, "generateNotification()")
         //Create notification channel
@@ -240,8 +304,8 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         cancelIntent.putExtra(EXTRA_CANCEL_LABELER_FROM_NOTIFICATION, true)
 
         val servicePendingIntent =
-            PendingIntent.getService(this, 0, cancelIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent, 0)
+            PendingIntent.getService(this, 0, cancelIntent, FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE)
+        val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent, FLAG_IMMUTABLE)
 
         val notificationCompatBuilder =
             NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)

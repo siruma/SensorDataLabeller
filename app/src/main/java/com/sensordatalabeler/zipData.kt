@@ -1,12 +1,21 @@
 package com.sensordatalabeler
 
-import java.io.*
+import java.io.File
+import java.io.BufferedOutputStream
+import java.io.FileOutputStream
+import java.io.BufferedInputStream
+import java.io.FileInputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-
+/**
+ * Create ZIP archive from file location.
+ *
+ * @param zipFile
+ * @param location
+ */
 fun zip(zipFile: File, location: File){
     if (!location.exists() && !location.isDirectory)
         throw java.lang.IllegalStateException("Location must be directory and exist")
@@ -15,7 +24,7 @@ fun zip(zipFile: File, location: File){
         if( !it.endsWith(File.separator)) "$it${File.separator}"
         else it
     }
-    var filesToZip = mutableListOf<File>()
+    val filesToZip = mutableListOf<File>()
 
     Files.walk(Paths.get(locationPath))
         .filter{item -> item.toString().endsWith(".csv") || item.toString().endsWith(".txt") }
@@ -40,6 +49,11 @@ private fun zip(outputStream: ZipOutputStream, filesToZip: List<File>) {
     }
 }
 
+/**
+ * Clean up the files from location.
+ *
+ * @param location
+ */
 fun cleanUp(location: File){
     if (!location.exists() && !location.isDirectory)
         throw java.lang.IllegalStateException("Location must be directory and exist")

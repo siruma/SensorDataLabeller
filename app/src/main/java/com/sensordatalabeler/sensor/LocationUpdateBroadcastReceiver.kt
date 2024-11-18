@@ -10,8 +10,19 @@ import com.sensordatalabeler.data.LocationManager
 import com.sensordatalabeler.data.db.MyLocationEntity
 import java.util.*
 
+/**
+ * Location Update Broadcast Receiver.
+ *
+ * Handles updates for location.
+ */
 class LocationUpdateBroadcastReceiver : BroadcastReceiver() {
 
+    /**
+     * onReceive
+     *
+     * @param context
+     * @param intent Used for extract the location data
+     */
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "onReceive() context:$context, intent:$intent")
 
