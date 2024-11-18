@@ -8,7 +8,7 @@ import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
 import com.sensordatalabeler.data.LocationManager
 import com.sensordatalabeler.data.db.MyLocationEntity
-import java.util.*
+import java.util.Date
 
 /**
  * Location Update Broadcast Receiver.
