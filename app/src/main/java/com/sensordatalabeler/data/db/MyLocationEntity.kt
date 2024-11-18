@@ -2,6 +2,9 @@ package com.sensordatalabeler.data.db
 
 import java.util.Date
 
+/**
+ * Data class for location.
+ */
 class MyLocationEntity(latitude: Double, longitude: Double, date: Date) {
 
     private val myLatitude = latitude

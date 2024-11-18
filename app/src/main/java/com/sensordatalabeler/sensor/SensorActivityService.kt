@@ -7,7 +7,11 @@ import android.hardware.SensorManager
 import android.util.Log
 import kotlin.math.roundToInt
 
-
+/**
+ * Sensor Activity Service
+ *
+ * Handles crating, measurement and stopping of sensor
+ */
 class SensorActivityService: SensorEventListener {
 
     private lateinit var mName: String
@@ -19,7 +23,13 @@ class SensorActivityService: SensorEventListener {
     private val mMeasurement: IntArray = IntArray(3)
 
 
-
+    /**
+     * Crate the sensor if available.
+     *
+     * @param sensorManager Sensor service
+     * @param type Type of sensor
+     * @param name Name of sensor
+     */
     fun onCreate(sensorManager: SensorManager, type : Int, name: String): SensorActivityService {
         Log.d(TAG, "onCreate()")
         mName = name
@@ -34,15 +44,24 @@ class SensorActivityService: SensorEventListener {
         return this
     }
 
+    /**
+     * Start the measurement from sensor.
+     */
     fun startMeasurement( delay : Int) {
         val sensorRegistered = mSensorManager.registerListener(this, mSensor, delay)
         Log.d(TAG, "$mName Sensor registered: " + (if (sensorRegistered) "yes" else "no"))
     }
 
+    /**
+     * Stop the measurement.
+     */
     fun stopMeasure() {
         mSensorManager.unregisterListener(this)
     }
 
+    /**
+     * Gets the value from sensor if it change.
+     */
     override fun onSensorChanged(event: SensorEvent) {
         if(mName == "HEART RATE" || mName == "STEP_COUNTER"){
             val mMeasurementFloat = event.values[0]
@@ -67,6 +86,9 @@ class SensorActivityService: SensorEventListener {
         mSensorManager.unregisterListener(this)
     }
 
+    /**
+     * Getter for measurement.
+     */
     fun getMeasurementRate(): IntArray {
             return mMeasurement
     }

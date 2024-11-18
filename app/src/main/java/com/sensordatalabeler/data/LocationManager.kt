@@ -3,6 +3,9 @@ package com.sensordatalabeler.data
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.app.PendingIntent.getBroadcast
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,11 +18,14 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.sensordatalabeler.data.db.MyLocationEntity
 import com.sensordatalabeler.sensor.LocationUpdateBroadcastReceiver
-import java.util.*
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
-
-@SuppressLint("UnspecifiedImmutableFlag")
+/**
+ * Manager class for location.
+ *
+ * Handles request and data.
+ */
 class LocationManager private constructor(private val context: Context) {
 
     private val _receivingLocationUpdates: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -42,9 +48,14 @@ class LocationManager private constructor(private val context: Context) {
     private val locationUpdatePendingIntent: PendingIntent by lazy {
         val intent = Intent(context, LocationUpdateBroadcastReceiver::class.java)
         intent.action = LocationUpdateBroadcastReceiver.ACTION_PROCESS_UPDATES
-        PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        getBroadcast(context, 0, intent, FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE)
     }
 
+    /**
+     * Start the location request service.
+     *
+     * @throws SecurityException If location permission has revoked.
+     */
     fun startLocationUpdates() {
         Log.d(TAG, "startLocationUpdates()")
 
@@ -63,12 +74,18 @@ class LocationManager private constructor(private val context: Context) {
         Log.d(TAG, "Location Update running")
     }
 
+    /**
+     * Stop the location update service.
+     */
     fun stopLocationUpdates() {
         Log.d(TAG, "stopLocationUpdates()")
         _receivingLocationUpdates.value = false
         fusedLocationClient.removeLocationUpdates(locationUpdatePendingIntent)
     }
 
+    /**
+     * Getter for location entity data.
+     */
     fun getLocationEntity(): MyLocationEntity {
         Log.d(TAG, "getLocationEntity")
         return locationEntity
@@ -76,9 +93,10 @@ class LocationManager private constructor(private val context: Context) {
 
     companion object {
         private const val TAG = "LocationManager"
-        var locationEntity =  MyLocationEntity(0.0,0.0,Date(0))
+        var locationEntity =  MyLocationEntity(0.0,0.0, Date(0))
 
         @SuppressLint("StaticFieldLeak")
+        @Volatile
         private var INSTANCE: LocationManager? = null
 
         fun getInstance(context: Context): LocationManager {

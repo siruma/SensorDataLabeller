@@ -5,6 +5,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import com.sensordatalabeler.data.SensorLabelerRepository
 
+/**
+ * Main view model.
+ *
+ * Handles data flow between main app and sensors.
+ *
+ * @param sensorLabelerRepository
+ */
 class MainViewModel(sensorLabelerRepository: SensorLabelerRepository) : ViewModel() {
     val activeSensorLabelerFlow = sensorLabelerRepository.activeSensorLabelerFlow.asLiveData()
     val heartRateFlow = sensorLabelerRepository.heartRateSensorFlow.asLiveData()
@@ -26,6 +33,11 @@ class MainViewModel(sensorLabelerRepository: SensorLabelerRepository) : ViewMode
     val dateFlow = sensorLabelerRepository.dateSensorFlow.asLiveData()
 }
 
+/**
+ * Main view models factory.
+ *
+ * @param sensorLabelerRepository
+ */
 class MainViewModelFactory(
     private val sensorLabelerRepository: SensorLabelerRepository
 ) : ViewModelProvider.Factory {

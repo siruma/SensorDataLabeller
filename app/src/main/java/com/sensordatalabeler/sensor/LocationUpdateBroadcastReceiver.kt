@@ -8,10 +8,21 @@ import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
 import com.sensordatalabeler.data.LocationManager
 import com.sensordatalabeler.data.db.MyLocationEntity
-import java.util.*
+import java.util.Date
 
+/**
+ * Location Update Broadcast Receiver.
+ *
+ * Handles updates for location.
+ */
 class LocationUpdateBroadcastReceiver : BroadcastReceiver() {
 
+    /**
+     * onReceive
+     *
+     * @param context
+     * @param intent Used for extract the location data
+     */
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "onReceive() context:$context, intent:$intent")
 
