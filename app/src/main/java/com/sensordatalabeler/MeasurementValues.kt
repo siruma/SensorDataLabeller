@@ -9,9 +9,6 @@ import java.util.Date
  */
 class MeasurementValues {
 
-    private val length = 3
-    private val numberOfDatapoint = 10
-
     private var activeMeasurement = false
     private var heartRate = 0
     private var time = ""
@@ -115,5 +112,7 @@ class MeasurementValues {
 
     companion object {
         private const val TAG = "MeasurementValues"
+        private const val length = 3
+        private const val numberOfDatapoint = 10
     }
 }

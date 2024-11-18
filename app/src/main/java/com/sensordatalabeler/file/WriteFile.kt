@@ -3,11 +3,8 @@ package com.sensordatalabeler.file
 import android.content.Context
 import android.os.Environment
 import android.util.Log
-import android.view.View
 import androidx.fragment.app.FragmentActivity
 import com.sensordatalabeler.MeasurementValues
-import com.sensordatalabeler.cleanUp
-import com.sensordatalabeler.zip
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileOutputStream
@@ -15,10 +12,8 @@ import java.io.OutputStreamWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class WriteFile {
+object WriteFile {
 
-
-    companion object {
         /**
          * Write META data.
          */
@@ -46,12 +41,12 @@ class WriteFile {
 
         fun writeZip(filesDir: File) {
             try {
-                zip(File(PATH_TO_DATA, "Data.zip"), File(PATH_TO_DATA))
-                cleanUp(File(PATH_TO_DATA))
+                ZipData.zip(File(PATH_TO_DATA, "Data.zip"), File(PATH_TO_DATA))
+                ZipData.cleanUp(File(PATH_TO_DATA))
             } catch (e: IllegalStateException) {
 
-                zip(File(filesDir, "Data.zip"), filesDir)
-                cleanUp(filesDir)
+                ZipData.zip(File(filesDir, "Data.zip"), filesDir)
+                ZipData.cleanUp(filesDir)
             }
         }
 
@@ -116,5 +111,4 @@ class WriteFile {
         private const val TAG = "WriteFile"
         private val PATH_TO_DATA =
             "${Environment.getExternalStorageDirectory()}/Android/data/com.sensordatalabeler/files/Data"
-    }
 }
