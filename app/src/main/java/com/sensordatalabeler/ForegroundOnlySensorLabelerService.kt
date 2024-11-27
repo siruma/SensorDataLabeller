@@ -201,7 +201,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         Log.d(TAG, "startSensorLabeler()")
 
         setActiveSensorLabeler(true)
-        heartRateSensor.startMeasurement(1000000)
+        heartRateSensor.startMeasurement(heartbeatDelay)
         gyroRateSensor.startMeasurement(0)
         accelerationRateSensor.startMeasurement(0)
         stepCounterSensor.startMeasurement(0)
@@ -351,6 +351,8 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
 
     companion object {
         private const val TAG = "ForegroundOnlyService"
+
+        private const val heartbeatDelay = 1000000
 
         private const val THREE_SECONDS_MILLISECONDS = 3000L
         private const val MINUTE_MILLISECONDS = 60000L

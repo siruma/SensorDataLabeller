@@ -38,9 +38,9 @@ class LocationManager private constructor(private val context: Context) {
         LocationServices.getFusedLocationProviderClient(context)
 
     private val locationRequest: LocationRequest =
-        LocationRequest.Builder(TimeUnit.SECONDS.toMillis(60))
-            .setIntervalMillis(TimeUnit.SECONDS.toMillis(60))
-            .setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(30))
+        LocationRequest.Builder(TimeUnit.SECONDS.toMillis(intervalMills))
+            .setIntervalMillis(TimeUnit.SECONDS.toMillis(intervalMills))
+            .setMinUpdateIntervalMillis(TimeUnit.SECONDS.toMillis(updateMills))
             .setMaxUpdateDelayMillis(TimeUnit.SECONDS.toMillis(2))
             .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
             .build()
@@ -93,6 +93,8 @@ class LocationManager private constructor(private val context: Context) {
 
     companion object {
         private const val TAG = "LocationManager"
+        private const val intervalMills = 60L
+        private const val updateMills = 30L
         var locationEntity =  MyLocationEntity(0.0,0.0, Date(0))
 
         @SuppressLint("StaticFieldLeak")
