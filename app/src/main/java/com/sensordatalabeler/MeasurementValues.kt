@@ -113,6 +113,6 @@ class MeasurementValues {
     companion object {
         private const val TAG = "MeasurementValues"
         private const val length = 3
-        private const val numberOfDatapoint = 10
+        private const val numberOfDatapoint = 9
     }
 }

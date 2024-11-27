@@ -36,7 +36,7 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         set(newActiveStatus) {
             if (field != newActiveStatus) {
                 field = newActiveStatus
-                if (newActiveStatus) {
+                if (!newActiveStatus) {
                     binding.startStopWorkoutButton.text =
                         getString(R.string.stop_sensor_button_text)
                 } else {
@@ -119,6 +119,9 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         }
 
         mainViewModel.activeSensorLabelerFlow.observe(this) { active ->
+            if (active){
+               Log.d(TAG, "Is active")
+            }
             activeSensorLabeler = active
         }
 
