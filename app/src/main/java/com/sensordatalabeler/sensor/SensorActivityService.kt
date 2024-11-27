@@ -20,7 +20,7 @@ class SensorActivityService: SensorEventListener {
     private lateinit var mSensorManager : SensorManager
     private var mSensor : Sensor ?= null
 
-    private val mMeasurement: IntArray = IntArray(3)
+    private val mMeasurement: IntArray = IntArray(mSize)
 
 
     /**
@@ -97,5 +97,6 @@ class SensorActivityService: SensorEventListener {
     companion object {
 
         private const val TAG = "Sensor Service:"
+        private const val mSize = 3
     }
 }

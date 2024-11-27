@@ -1,8 +1,7 @@
 package com.sensordatalabeler
 
 
-import android.view.InputDevice
-import android.view.MotionEvent
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -19,25 +18,34 @@ import org.junit.runner.RunWith
 class LabelerUnitTest {
 
     @get:Rule
-    var activityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
+    val rule =  ActivityScenarioRule(MainActivity::class.java)
 
     // First test
     @Test
     fun startMenu(){
+        Thread.sleep(1000) // Temporary delay for debugging (remove in production tests)
         onView(withId(R.id.start_stop_workout_button))
             .check(matches(isDisplayed()))
-        onView(withId(R.id.save_sensor_data_button))
+        onView(withId(R.id.export_sensor_data_button))
             .check(matches(isDisplayed()))
     }
     @Test
     fun startMeasurement() {
+        Thread.sleep(1000) // Temporary delay for debugging (remove in production tests)
+        // Check that the button is displayed
         onView(withId(R.id.start_stop_workout_button))
             .check(matches(isDisplayed()))
+
+        // Check that the button is clickable and perform a click action
         onView(withId(R.id.start_stop_workout_button))
-            .check(matches( isClickable()))
-            .perform(click(InputDevice.SOURCE_ANY,MotionEvent.BUTTON_PRIMARY))
+            .check(matches(isClickable()))
+            .perform(click())
+
+        // Perform another click action
         onView(withId(R.id.start_stop_workout_button))
-            .perform(click(InputDevice.SOURCE_ANY,MotionEvent.BUTTON_PRIMARY))
+            .perform(click())
+
+        // Assert that the text "Start Sensor" is displayed
         onView(withText(STRING_START)).check(matches(isDisplayed()))
     }
 
