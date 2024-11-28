@@ -9,6 +9,7 @@ import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.drawable.Icon
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Binder
@@ -59,7 +60,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
     private var sensorLabelerActive = false
 
     private var dataFromSensorJob: Job? = null
-    private  var locationJob: Job? = null
+    private var locationJob: Job? = null
 
     /**
      * Setter Status of Sensor labeler.
@@ -200,7 +201,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         Log.d(TAG, "startSensorLabeler()")
 
         setActiveSensorLabeler(true)
-        heartRateSensor.startMeasurement(1000000)
+        heartRateSensor.startMeasurement(heartbeatDelay)
         gyroRateSensor.startMeasurement(0)
         accelerationRateSensor.startMeasurement(0)
         stepCounterSensor.startMeasurement(0)
@@ -225,12 +226,14 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
                 val intArray = it.getMeasurementRate()
                 sensorLabelerRepository.setGyroXRateSensor(intArray[0])
                 sensorLabelerRepository.setGyroYRateSensor(intArray[1])
-                sensorLabelerRepository.setGyroZRateSensor(intArray[2])}
+                sensorLabelerRepository.setGyroZRateSensor(intArray[2])
+            }
             accelerationRateSensor.let {
                 val intArray = it.getMeasurementRate()
                 sensorLabelerRepository.setAccelerationXRateSensor(intArray[0])
                 sensorLabelerRepository.setAccelerationYRateSensor(intArray[1])
-                sensorLabelerRepository.setAccelerationZRateSensor(intArray[2])}
+                sensorLabelerRepository.setAccelerationZRateSensor(intArray[2])
+            }
             stepCounterSensor.let { sensorLabelerRepository.setStepCounterSensor(it.getMeasurementRate()[0]) }
             val sdf = SimpleDateFormat("HH_mm_ss", Locale.ENGLISH)
             sensorLabelerRepository.setTimeStampSensor(sdf.format(Date()))
@@ -305,7 +308,8 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
 
         val servicePendingIntent =
             PendingIntent.getService(this, 0, cancelIntent, FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE)
-        val activityPendingIntent = PendingIntent.getActivity(this, 0, launchActivityIntent, FLAG_IMMUTABLE)
+        val activityPendingIntent =
+            PendingIntent.getActivity(this, 0, launchActivityIntent, FLAG_IMMUTABLE)
 
         val notificationCompatBuilder =
             NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL_ID)
@@ -330,6 +334,7 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
         val ongoingActivity = OngoingActivity.Builder(
             applicationContext, NOTIFICATION_ID, notificationBuilder
         )
+            .setStaticIcon(Icon.createWithResource(applicationContext, R.drawable.ic_static_icon))
             .setTouchIntent(activityPendingIntent)
             .setStatus(ongoingActivityStatus)
             .build()
@@ -346,6 +351,8 @@ class ForegroundOnlySensorLabelerService : LifecycleService() {
 
     companion object {
         private const val TAG = "ForegroundOnlyService"
+
+        private const val heartbeatDelay = 1000000
 
         private const val THREE_SECONDS_MILLISECONDS = 3000L
         private const val MINUTE_MILLISECONDS = 60000L
