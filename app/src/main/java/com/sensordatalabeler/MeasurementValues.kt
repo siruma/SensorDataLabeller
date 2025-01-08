@@ -28,7 +28,7 @@ class MeasurementValues {
      * @param value value of measurement
      */
     fun addMeasurement(type: String, value: Any) {
-        if (this.mNumber > numberOfDatapoint) {
+        if (this.mNumber >= numberOfDatapoint) {
             this.mNumber = 0
         }
         when (type) {
@@ -67,14 +67,21 @@ class MeasurementValues {
     }
 
     /**
-     * Setter for Activity name
+     * Setter for Activity name.
      */
     fun setNameOfActivity(name: String) {
         nameOfActivity = name
     }
 
     /**
-     * Getter for data
+     * Getter for Activity name.
+     */
+    fun getNameOfAcvity(): String {
+        return nameOfActivity
+    }
+
+    /**
+     * Getter for data.
      */
     fun getData(): Array<String> {
         return valuesArray

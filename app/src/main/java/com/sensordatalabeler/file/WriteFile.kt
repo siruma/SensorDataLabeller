@@ -19,7 +19,7 @@ object WriteFile {
          */
         fun writeMetaData(applicationContext: Context) {
             val metadata =
-                "[NAME, DATA, ACCELERATION(x,y,z), HEART RATE, GYRO(x,y,z), STEPS, (LATITUDE,LONGITUDE)]"
+                "[NAME, DATE, ACCELERATION(x,y,z), HEART RATE, GYRO(x,y,z), STEPS, (LATITUDE,LONGITUDE)]"
             val metaFileName = "metadata.txt"
             val os = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
                 val dir = File(PATH_TO_DATA)
