@@ -172,8 +172,7 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         } else {
             foregroundOnlySensorLabelerService?.startSensorLabeler()
             measurementValues.setActiveMeasurement(true)
-            binding.exportSensorDataButton.visibility = View.GONE
-            binding.nameMeasurement.visibility = View.VISIBLE
+            hideExportButton()
             WriteFile.openFile(measurementValues, applicationContext)
         }
     }
@@ -185,6 +184,7 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         Log.d(TAG, "onClickSensorExport()")
         if (activeSensorLabeler) {
             Log.d(TAG, "Sensor measurement ongoing")
+            hideExportButton()
         } else {
             Log.d(TAG, "Sensor data Exported")
             val output = "Data Exported"
@@ -271,8 +271,9 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         }
         val b = view as Button
         measurementValues.setNameOfActivity(b.text.toString())
-        Log.d(TAG, "NAME: $measurementValues.nameOfActivity")
+        Log.d(TAG, "NAME: " + measurementValues.getNameOfAcvity())
         WriteFile.saveData(measurementValues)
+        hideExportButton()
     }
 
     /**
@@ -291,6 +292,14 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         Log.d(TAG, "Heart Rate: $measurement")
         val output = getString(R.string.heart_rate_text, measurement)
         binding.outputTextView.text = output
+    }
+
+    private fun hideExportButton() {
+        if (activeSensorLabeler) {
+            binding.exportSensorDataButton.visibility = View.GONE
+            binding.nameMeasurement.visibility = View.VISIBLE
+            updateHeartRate(measurementValues.getHeartRate())
+        }
     }
 
     companion object {
