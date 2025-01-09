@@ -39,13 +39,12 @@ object WriteFile {
 
         }
 
-        fun writeZip(filesDir: File) {
+        fun writeZip(timeTag: String, filesDir: File) {
             try {
-                ZipData.zip(File(PATH_TO_DATA, "Data.zip"), File(PATH_TO_DATA))
+                ZipData.zip(File(PATH_TO_DATA, "Data$timeTag.zip"), File(PATH_TO_DATA))
                 ZipData.cleanUp(File(PATH_TO_DATA))
             } catch (e: IllegalStateException) {
-
-                ZipData.zip(File(filesDir, "Data.zip"), filesDir)
+                ZipData.zip(File(filesDir, "Data$timeTag.zip"), filesDir)
                 ZipData.cleanUp(filesDir)
             }
         }

@@ -126,9 +126,9 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
             measurementValues.addMeasurement("location", locationData)
         }.launchIn(lifecycleScope)
 
-        mainViewModel.dateFlow.observe(this) { dateSensor ->
+        /**mainViewModel.dateFlow.observe(this) { dateSensor ->
             measurementValues.setDate(Date(dateSensor))
-        }
+        }*/
     }
 
     /**
@@ -161,6 +161,7 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
             foregroundOnlySensorLabelerService?.stopSensorLabeler()
             measurementValues.setActiveMeasurement(false)
             nameSensorData()
+            WriteFile.saveData(measurementValues)
             binding.startStopWorkoutButton.text =
                 getString(R.string.start_sensor_button_text)
         } else {
@@ -186,7 +187,7 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
             Log.d(TAG, "Sensor data Exported")
             val output = "Data Exported"
             WriteFile.writeMetaData(applicationContext)
-            WriteFile.writeZip(filesDir)
+            WriteFile.writeZip(measurementValues.getTime(), filesDir)
             binding.outputTextView.text = output
         }
     }
@@ -269,7 +270,6 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         val b = view as Button
         measurementValues.setNameOfActivity(b.text.toString())
         Log.d(TAG, "NAME: " + measurementValues.getNameOfAcvity())
-        WriteFile.saveData(measurementValues)
         hideExportButton()
     }
 
