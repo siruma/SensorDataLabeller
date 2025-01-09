@@ -36,14 +36,6 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
         set(newActiveStatus) {
             if (field != newActiveStatus) {
                 field = newActiveStatus
-                if (!newActiveStatus) {
-                    binding.startStopWorkoutButton.text =
-                        getString(R.string.stop_sensor_button_text)
-                } else {
-                    binding.startStopWorkoutButton.text =
-                        getString(R.string.start_sensor_button_text)
-                }
-
             }
         }
 
@@ -169,11 +161,16 @@ class MainActivity : FragmentActivity(), AmbientModeSupport.AmbientCallbackProvi
             foregroundOnlySensorLabelerService?.stopSensorLabeler()
             measurementValues.setActiveMeasurement(false)
             nameSensorData()
+            binding.startStopWorkoutButton.text =
+                getString(R.string.start_sensor_button_text)
         } else {
             foregroundOnlySensorLabelerService?.startSensorLabeler()
             measurementValues.setActiveMeasurement(true)
-            hideExportButton()
             WriteFile.openFile(measurementValues, applicationContext)
+            nameSensorData()
+            hideExportButton()
+            binding.startStopWorkoutButton.text =
+                getString(R.string.stop_sensor_button_text)
         }
     }
 
