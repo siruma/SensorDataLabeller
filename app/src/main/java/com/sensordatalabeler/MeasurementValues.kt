@@ -1,7 +1,9 @@
 package com.sensordatalabeler
 
 import android.util.Log
-import java.util.Date
+import com.sensordatalabeler.file.WriteFile
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Measurement Values Class.
@@ -16,7 +18,7 @@ class MeasurementValues {
     private var acceleration: IntArray = IntArray(length)
     private var steps = 0
     private var location: DoubleArray = DoubleArray(2)
-    private var date = Date()
+    private var date = ""
     private var nameOfActivity = "NO NAME"
     private var valuesArray = Array(numberOfDatapoint) { "" }
     private var mNumber = 0
@@ -30,6 +32,7 @@ class MeasurementValues {
     fun addMeasurement(type: String, value: Any) {
         if (this.mNumber >= numberOfDatapoint) {
             this.mNumber = 0
+            WriteFile.saveData(this)
         }
         when (type) {
             "heartRate" -> this.heartRate = value as Int
@@ -39,6 +42,9 @@ class MeasurementValues {
             "location" -> this.location = value as DoubleArray
             else -> Log.d(TAG, "Type not supported.")
         }
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        this.date = current.format(formatter)
         this.valuesArray[mNumber] =
             "${this.nameOfActivity},${this.date},${this.acceleration.toList()}," +
                     "${this.heartRate},${this.gyro.toList()},${this.steps},${this.location.toList()};"
@@ -57,13 +63,6 @@ class MeasurementValues {
      */
     fun setTime(timeString: String) {
         time = timeString
-    }
-
-    /**
-     * Setter for date.
-     */
-    fun setDate(dateSensor: Date) {
-        date = dateSensor
     }
 
     /**
@@ -120,6 +119,6 @@ class MeasurementValues {
     companion object {
         private const val TAG = "MeasurementValues"
         private const val length = 3
-        private const val numberOfDatapoint = 9
+        private const val numberOfDatapoint = 30
     }
 }
