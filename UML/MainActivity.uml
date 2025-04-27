@@ -1,0 +1,176 @@
+plantuml
+@startuml
+' Style settings
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' Classes
+class MainActivity {
+    - binding: ActivityMainBinding
+    - ambientController: AmbientModeSupport.AmbientController
+    - mainViewModel: MainViewModel
+    - activeSensorLabeler: Boolean
+    - measurementValues: MeasurementValues
+    - activeMeasurement: Boolean
+    - foregroundOnlyServiceBound: Boolean
+    - foregroundOnlySensorLabelerService: ForegroundOnlySensorLabelerService?
+    - foregroundOnlyServiceConnection: ServiceConnection
+    + onCreate(savedInstanceState: Bundle?)
+    + onStart()
+    + onStop()
+    + onClickSensorLabeler(view: View)
+    + onClickSensorExport(view: View)
+    + onClickSensorName(view: View)
+    + onClickChoice(view: View)
+    + onClickNext(view: View)
+    + onClickElse(view: View)
+    + onClickSave(view: View)
+    - saveChoice(view: View)
+    - nameSensorData()
+    - updateHeartRate(measurement: Int)
+    - hideExportButton()
+    + getAmbientCallback(): AmbientModeSupport.AmbientCallback
+}
+
+class MeasurementValues {
+    - measurements: MutableMap<String, MutableList<Any>>
+    - time: String
+    - date: Date
+    - nameOfAcvity: String
+    - activeMeasurement: Boolean
+    + addMeasurement(sensorName: String, measurement: Any)
+    + setTime(time: String)
+    + setDate(date: Date)
+    + setNameOfActivity(name: String)
+    + getNameOfAcvity(): String
+    + getActiveMeasurement(): Boolean
+    + setActiveMeasurement(active: Boolean)
+    + getHeartRate(): Int
+    + getTime(): String
+}
+
+class ForegroundOnlySensorLabelerService {
+    - sensorLabelerRepository: SensorLabelerRepository
+    - locationReceiver: LocationManager
+    - notificationManager: NotificationManager
+    - heartRateSensor: SensorActivityService
+    - gyroRateSensor: SensorActivityService
+    - accelerationRateSensor: SensorActivityService
+    - stepCounterSensor: SensorActivityService
+    - confChange: Boolean
+    - serviceRunForeground: Boolean
+    - localBinder: LocalBinder
+    - sensorLabelerActive: Boolean
+    - dataFromSensorJob: Job?
+    - locationJob: Job?
+    - setActiveSensorLabeler(active: Boolean)
+    + onCreate()
+    + onStartCommand(intent: Intent?, flags: Int, startId: Int): Int
+    + onBind(intent: Intent): IBinder
+    + onRebind(intent: Intent?)
+    + onUnbind(intent: Intent?): Boolean
+    + onConfigurationChanged(newConfig: Configuration)
+    - notForegroundService()
+    + startSensorLabeler()
+    - readSensorData()
+    - readLocationData()
+    + stopSensorLabeler()
+    - stopSensorLabelerWithServiceShutdownOption(stopService: Boolean)
+    - generateNotification(mainText: String): Notification
+}
+
+class MainViewModel {
+    + heartRateFlow: LiveData<Int>
+    + gyroXRateFlow: LiveData<Int>
+    + gyroYRateFlow: LiveData<Int>
+    + gyroZRateFlow: LiveData<Int>
+    + accelerationXFlow: LiveData<Int>
+    + accelerationYFlow: LiveData<Int>
+    + accelerationZFlow: LiveData<Int>
+    + stepCounterFlow: LiveData<Int>
+    + timeStampFlow: LiveData<Long>
+    + activeSensorLabelerFlow: LiveData<Boolean>
+    + latitudeFlow: Flow<Double>
+    + longitudeFlow: Flow<Double>
+}
+
+class MainViewModelFactory {
+    + create(modelClass: Class<T>): T
+}
+
+class ActivityMainBinding {
+    + startStopWorkoutButton: Button
+    + exportSensorDataButton: Button
+    + outputTextView: TextView
+    + nameMeasurement: LinearLayout
+    + nameMenu1: LinearLayout
+    + nameMenu2: LinearLayout
+    + nameMenu3: LinearLayout
+    + nameMenu4: LinearLayout
+    + customName: LinearLayout
+    + mainMenu: LinearLayout
+}
+
+class WriteFile {
+    + saveData(measurementValues: MeasurementValues)
+    + openFile(measurementValues: MeasurementValues, context: Context)
+    + writeMetaData(context: Context)
+    + writeZip(time: String, filesDir: File)
+}
+
+class SensorLabelerRepository {
+    + setActiveSensorLabeler(active: Boolean)
+    + setHeartRateSensor(rate: Int)
+    + setGyroXRateSensor(rate: Int)
+    + setGyroYRateSensor(rate: Int)
+    + setGyroZRateSensor(rate: Int)
+    + setAccelerationXRateSensor(rate: Int)
+    + setAccelerationYRateSensor(rate: Int)
+    + setAccelerationZRateSensor(rate: Int)
+    + setStepCounterSensor(rate: Int)
+    + setTimeStampSensor(time: String)
+    + setLocationsSensor(location: MyLocationEntity)
+    + activeSensorLabelerFlow: Flow<Boolean>
+}
+
+class LocationManager {
+    - _receivingLocationUpdates: MutableLiveData<Boolean>
+    + receivingLocationUpdates: LiveData<Boolean>
+    - fusedLocationClient: FusedLocationProviderClient
+    - locationRequest: LocationRequest
+    - locationUpdatePendingIntent: PendingIntent
+    + startLocationUpdates()
+    + stopLocationUpdates()
+    + getLocationEntity(): MyLocationEntity
+    + getInstance(context: Context): LocationManager
+}
+
+class SensorActivityService {
+    + startMeasurement(delay: Int)
+    + stopMeasure()
+    + getMeasurementRate(): Int[]
+}
+
+class MyLocationEntity {
+    + latitude: Double
+    + longitude: Double
+    + date: Date
+}
+
+
+' Relationships
+MainActivity "1" -- "1" ActivityMainBinding : uses
+MainActivity "1" -- "1" MeasurementValues : uses
+MainActivity "1" -- "0..1" ForegroundOnlySensorLabelerService : uses
+MainActivity "1" -- "1" MainViewModel : uses
+MainActivity "1" -- "1" WriteFile : uses
+MainViewModelFactory "1" -- "1" MainViewModel : creates
+ForegroundOnlySensorLabelerService "1" -- "1" SensorLabelerRepository : uses
+ForegroundOnlySensorLabelerService "1" -- "1" LocationManager : uses
+ForegroundOnlySensorLabelerService "1" -- "1" NotificationManager : uses
+ForegroundOnlySensorLabelerService "1" -- "1" SensorActivityService : uses
+LocationManager "1" -- "1" MyLocationEntity : uses
+LocationManager "1" -- "1" LocationUpdateBroadcastReceiver : uses
+SensorLabelerRepository "1" -- "1" MyLocationEntity : uses
+
+@enduml
